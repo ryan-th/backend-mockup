@@ -42,26 +42,33 @@ export interface SchoolQueryObject extends QueryObject {
     'city.country'?: (keyof Country)[];
   };
   filter?: {
-    id?: number[];
-    name?: {
-      matches?: string;
-    };
-    academicSystem?: {
-      id?: number[];
-    };
-    city?: {
-      id?: number[];
-      name?: {
-        matches?: string;
-      };
-    };
-    'city.country'?: {
-      id?: number[];
-      name?: {
-        matches?: string;
-      };
-    };
+    id?: FilterOperator;
+    name?: FilterOperator;
+    cityId?: FilterOperator;
+    hasBeenVisitedByTh?: FilterOperator;
   };
+
+  // filter?: {
+  //   id?: number[];
+  //   name?: {
+  //     matches?: string;
+  //   };
+  //   academicSystem?: {
+  //     id?: number[];
+  //   };
+  //   city?: {
+  //     id?: number[];
+  //     name?: {
+  //       matches?: string;
+  //     };
+  //   };
+  //   'city.country'?: {
+  //     id?: number[];
+  //     name?: {
+  //       matches?: string;
+  //     };
+  //   };
+  // };
   // always singular? => probably
   include?: (
     | 'city'
@@ -105,13 +112,22 @@ export interface CityQueryObject extends QueryObject {
 }
 
 export interface CountryQueryObject extends QueryObject {
-  page?: QueryObjectPage;
   fields?: {
-    country?: string[];
+    country?: (keyof Country)[];
+    // region?: (keyof Region)[];
   };
   filter?: {
-    id?: number[];
+    id?: FilterOperator;
+    name?: FilterOperator;
+    slug?: FilterOperator;
   };
+  page?: QueryObjectPage;
+  sort?: (
+    | `-${keyof Country}`
+    | keyof Country
+    // | `-region.${keyof Region}`
+    // | `region.${keyof Region}`
+  )[];
 }
 
 export interface AcademicSystemQueryObject extends QueryObject {

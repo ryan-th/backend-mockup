@@ -276,18 +276,36 @@ function getList(query: Query): Observable<EntitySet> {
   }
 
   if (isCountryQueryObject(qo)) {
-    entitySet.data = entitySet.data.filter((x) =>
-      qo.filter?.id?.includes(x['id'])
-    );
+    // entitySet.data = entitySet.data.filter((x) =>
+    //   qo.filter?.id?.includes(x['id'])
+    // );
+    let data = entitySet.data;
+    data = data.filter((x: City) => {
+      if (!qo.filter) return true;
+      if (!match_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!match_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      return true;
+    });
+
+    entitySet.data = data;
   }
 
   if (isSchoolQueryObject(qo)) {
-    if (qo.filter.city) {
-      entitySet.data = entitySet.data.filter((x) =>
-        // if 'includes' is erroring, try adding a space to tsconfig.json (stackblitz bug workaround)
-        qo.filter.city.id.includes(x['cityId'])
-      );
-    }
+    // if (qo.filter.city) {
+    //   entitySet.data = entitySet.data.filter((x) =>
+    //     // if 'includes' is erroring, try adding a space to tsconfig.json (stackblitz bug workaround)
+    //     qo.filter.city.id.includes(x['cityId'])
+    //   );
+    // }
+    let data = entitySet.data;
+    data = data.filter((x: City) => {
+      if (!qo.filter) return true;
+      if (!match_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!match_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      return true;
+    });
+
+    entitySet.data = data;
   }
 
   // pluck requested fields
@@ -344,6 +362,8 @@ function getIncluded(
   let set = [];
   const qo = query.object;
 
+  console.log(555, qo, relationships, Object.keys(relationships));
+
   Object.keys(relationships).forEach((key) => {
     const listRelationship = entitySetRelationships.find((x) => x.name === key);
     const entitySet = entitySets.find(
@@ -354,7 +374,7 @@ function getIncluded(
 
     // pluck requested fields
     const fieldNames: string[] =
-      qo.fields[listRelationship.toEntityName] ||
+      qo.fields?.[listRelationship.toEntityName] ||
       entitySet.defaultPropertyNames;
     console.log(333, entitySet, listRelationship.toEntityName, fieldNames);
     subset = entitiesPluck(subset, fieldNames);

@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "lib": ["es7", "dom", "ES2016.Array.Include"],
+    "target": "esnext"
+  }
+}

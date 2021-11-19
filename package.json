@@ -1,0 +1,12 @@
+{
+  "name": "typescript-pkyxa1",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@types/json-schema": "^7.0.9",
+    "@types/node": "^16.11.7",
+    "ajv": "^8.8.1",
+    "rxjs": "7.4.0",
+    "typescript-json-schema": "^0.51.0"
+  }
+}

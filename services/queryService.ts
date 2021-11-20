@@ -1,13 +1,13 @@
 import Ajv from 'ajv';
-import { ValidateFunction } from 'ajv/dist/core';
+import { ErrorObject as AjvErrorObject, ValidateFunction } from 'ajv/dist/core';
 import { entitySets } from '../data';
+import { ErrorObject as JsonApiErrorObject } from '../interfaces/jsonapi-typescript';
 import {
   AcademicSystemQueryObject,
   CityQueryObject,
   CountryQueryObject,
   Operator,
   Query,
-  QueryError,
   QueryObject,
   QueryObjectKey,
   SchoolQueryObject,
@@ -16,6 +16,22 @@ import { cityQueryObjectSchema } from '../queries/schemas/cities';
 import { schoolQueryObjectSchema } from '../queries/schemas/schools';
 import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
 import { mergeObjects } from './genericServices';
+
+// TODO: move higher
+interface Validators {
+  isValidCityQueryObject: ValidateFunction<unknown>;
+  isValidSchoolQueryObject: ValidateFunction<unknown>;
+}
+
+let _validators: Validators;
+
+function getValidators() {
+  const ajv = new Ajv();
+  return {
+    isValidCityQueryObject: ajv.compile(cityQueryObjectSchema),
+    isValidSchoolQueryObject: ajv.compile(schoolQueryObjectSchema),
+  };
+}
 
 export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
   x.type === 'school';
@@ -134,37 +150,38 @@ export function deriveQueryParamObjectFromQueryParamString(
   }
 }
 
-interface Validators {
-  isValidCityQueryObject: ValidateFunction<unknown>;
-  isValidSchoolQueryObject: ValidateFunction<unknown>;
-}
-
-let validators: Validators;
-
-function getValidators() {
-  const ajv = new Ajv();
-  return {
-    isValidCityQueryObject: ajv.compile(cityQueryObjectSchema),
-    isValidSchoolQueryObject: ajv.compile(schoolQueryObjectSchema),
-  };
+function deriveJsonApiErrorObjectFromAjvErrorObject(
+  ajv: AjvErrorObject
+): JsonApiErrorObject {
+  // TODO: this is WIP
+  const params = JSON.stringify(ajv.params);
+  const title = `${ajv.message} (${ajv.instancePath}, ${params})`;
+  const detail = JSON.stringify(ajv);
+  return { id: 'WIP: ' + ajv.keyword, title: title, detail: detail };
 }
 
 // TODO: add more cases; define behaviour; add more QueryError values
-export function validateQuery(query: Query): QueryError {
+export function validateQuery(query: Query): JsonApiErrorObject[] {
   const qo: QueryObject = query.object;
-  if (!validators) validators = getValidators();
 
-  if (qo == null || qo.type === undefined) return { slug: 'invalid-resource' };
+  if (qo == null) return [{ id: 'query-object-null' }];
+  if (qo.type === undefined)
+    return [{ id: 'query-object-type-not-recognised' }];
 
-  if (isCityQueryObject(qo)) {
-    const idValid = validators.isValidCityQueryObject(qo);
-    if (!idValid) return { slug: 'invalid-resource' };
-  }
+  // TODO: refactor (create a standard function or pass as param)
+  const entitySet = entitySets.find((x) => x.entityName === qo.type);
 
-  if (isSchoolQueryObject(qo)) {
-    const idValid = validators.isValidSchoolQueryObject(qo);
-    if (!idValid) return { slug: 'invalid-resource' };
-  }
+  const ajv = new Ajv();
+  const validateQueryObject = ajv.compile(entitySet.querySchema);
+  const isValid = validateQueryObject(qo);
+  if (isValid) return null;
 
-  return null;
+  const ajvErrorObjects = validateQueryObject.errors;
+  const jsonApiErrorObjects = ajvErrorObjects.map((ajvErrorObject) =>
+    deriveJsonApiErrorObjectFromAjvErrorObject(ajvErrorObject)
+  );
+
+  console.log(88, ajvErrorObjects, jsonApiErrorObjects);
+
+  return jsonApiErrorObjects;
 }

@@ -1,12 +1,18 @@
 import { AcademicSystem, City, Country, EntityName, School } from './entities';
+import { Errors } from './jsonapi-typescript';
 
 // generic
+
+// TODO: consider refactoring
 export interface Query {
-  isValidObject?: boolean;
   slug: string;
   description?: string;
   path: string;
   object: QueryObject;
+
+  // WIP
+  isValidObject?: boolean;
+  errors?: Errors;
 }
 
 export interface QueryObjectPage {

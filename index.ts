@@ -122,13 +122,14 @@ function setObservables() {
 
   const validateQuery$ = ([query]) => {
     console.log('query:', query);
-    const queryError = validateQuery(query);
-    query.isValidObject = !queryError;
-    return combineLatest([of(query), of(queryError)]);
+    const queryErrors = validateQuery(query);
+    query.isValidObject = !queryErrors;
+    query.errors = queryErrors;
+    return combineLatest([of(query), of(queryErrors)]);
   };
 
-  const getList$ = ([query, queryError]) => {
-    console.log('queryError:', queryError);
+  const getList$ = ([query, queryErrors]) => {
+    console.log('queryErrors:', queryErrors);
     const list$ = getList(query);
     return combineLatest([of(query), list$]);
   };
@@ -161,6 +162,7 @@ function setObservables() {
     // TODO: construct correct jsonApi
     const jsonApi = {
       isValidRequest: query.isValidObject,
+      errors: query.errors,
       list: list,
       relationships: relationships,
       included: included,

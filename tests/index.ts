@@ -1,6 +1,7 @@
 import { getTestResults as getTestResults_deriveQueryObjectFromQueryPath } from './deriveQueryObjectFromQueryPath';
 import { getTestResults as getTestResults_deriveQueryParamObjectFromQueryParamString } from './deriveQueryParamObjectFromQueryParamString';
 import { getTestResults as getTestResults_parseToTypedValue } from './parseToTypedValue';
+import { getTestResults as getTestResults_validateQuery } from './validateQuery';
 
 export interface Test {
   functionName?: string;
@@ -16,6 +17,7 @@ export function runTests(): void {
     ...getTestResults_deriveQueryObjectFromQueryPath(),
     ...getTestResults_deriveQueryParamObjectFromQueryParamString(),
     ...getTestResults_parseToTypedValue(),
+    ...getTestResults_validateQuery(),
   ];
   const errors = results.filter((x) => !x.isSuccess);
   if (errors.length > 0) console.log('Test errors:', errors);

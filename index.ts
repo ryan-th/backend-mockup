@@ -1,37 +1,38 @@
 import { forkJoin, combineLatest, fromEvent, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
+// interfaces
 import { City, Entity, EntityName, EntitySet } from './interfaces/entities';
 import {
   EntityRelationship,
   EntitySetRelationshipName,
 } from './interfaces/relationships';
-import {
-  CityQueryObject,
-  Operator,
-  Query,
-  QueryError,
-  QueryObject,
-} from './interfaces/queries';
+import { Query, QueryObject } from './interfaces/queries';
 
+// data
 import { entitySetRelationships, entitySets } from './data';
 import { queries } from './queries/index';
-import {
-  deriveQueryObjectFromQueryPath,
-  isAcademicSystemQueryObject,
-  isCityQueryObject,
-  isCountryQueryObject,
-  isSchoolQueryObject,
-  match_listIncludes,
-  match_stringMatches,
-} from './queryService';
+
+// services
 import {
   getEntitySetRelationship,
   entitiesPluck,
   compareFnGenerator,
-} from './dataService';
-import { cityQueryObjectSchema } from './queries/schemas/cities';
-import Ajv from 'ajv';
+} from './services/dataService';
+import {
+  isMatch_listIncludes,
+  isMatch_stringMatches,
+} from './services/filterService';
+import {
+  deriveQueryFromQueryPath,
+  isAcademicSystemQueryObject,
+  isCityQueryObject,
+  isCountryQueryObject,
+  isSchoolQueryObject,
+  validateQuery,
+} from './services/queryService';
+
+// tests
 import { runTests } from './tests';
 
 // let select: HTMLSelectElement;
@@ -115,13 +116,14 @@ function setObservables() {
 
   const deriveQuery$ = (queryPath) => {
     console.log('queryPath:', queryPath);
-    const query = deriveQuery(queryPath);
+    const query = deriveQueryFromQueryPath(queryPath);
     return combineLatest([of(query)]);
   };
 
   const validateQuery$ = ([query]) => {
     console.log('query:', query);
     const queryError = validateQuery(query);
+    query.isValidObject = !queryError;
     return combineLatest([of(query), of(queryError)]);
   };
 
@@ -158,6 +160,7 @@ function setObservables() {
     console.log('included:', included);
     // TODO: construct correct jsonApi
     const jsonApi = {
+      isValidRequest: query.isValidObject,
       list: list,
       relationships: relationships,
       included: included,
@@ -184,41 +187,6 @@ function setObservables() {
   );
 }
 
-// TODO: move higher
-function deriveQuery(queryPath: string): Query {
-  const queryObject = deriveQueryObjectFromQueryPath(queryPath);
-
-  const query: Query = {
-    slug: 'custom',
-    description: 'custom query',
-    path: queryPath,
-    object: queryObject,
-  };
-
-  return query;
-}
-
-function validateQuery(query: Query): QueryError {
-  const qo: QueryObject = query.object;
-  const ajv = new Ajv();
-
-  if (qo == null) return { slug: 'invalid-resource' };
-  if (qo.type === undefined) return { slug: 'invalid-resource' };
-
-  if (isCityQueryObject(qo)) {
-    // validate qo against city
-
-    const validate = ajv.compile(cityQueryObjectSchema);
-    const idValid = validate(qo);
-    console.log('Is valid: ', idValid);
-    if (!idValid) console.log('Errors: ', validate.errors);
-
-    if (!idValid) return { slug: 'invalid-resource' };
-  }
-
-  return null;
-}
-
 // function deriveSubQuery(query: Query, entityName: string): Query {
 //   // TODO: utilise; derive rather than hard-code
 //   if (entityName === 'city') return queries[1];
@@ -229,7 +197,7 @@ function getList(query: Query): Observable<EntitySet> {
   const qo: QueryObject = query.object;
   let entitySet: EntitySet;
 
-  if (query.object == null) return of(null);
+  if (!query.isValidObject) return of(null);
 
   entitySet = { ...entitySets.find((x) => x.entityName == qo.type) };
 
@@ -237,8 +205,8 @@ function getList(query: Query): Observable<EntitySet> {
     let data = entitySet.data;
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!match_listIncludes(x.id, qo.filter.id?.in)) return false;
-      if (!match_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
 
@@ -251,8 +219,8 @@ function getList(query: Query): Observable<EntitySet> {
     // filtering; TODO: move higher
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!match_listIncludes(x.id, qo.filter.id?.in)) return false;
-      if (!match_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
 
@@ -282,8 +250,8 @@ function getList(query: Query): Observable<EntitySet> {
     let data = entitySet.data;
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!match_listIncludes(x.id, qo.filter.id?.in)) return false;
-      if (!match_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
 
@@ -300,8 +268,8 @@ function getList(query: Query): Observable<EntitySet> {
     let data = entitySet.data;
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!match_listIncludes(x.id, qo.filter.id?.in)) return false;
-      if (!match_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
 
@@ -328,7 +296,7 @@ function getListRelationships(
   listIds: number[]
 ): Observable<Record<EntityName, EntityRelationship[]> | {}> {
   // TODO: consider this returning all 'relationships' AND 'included'
-  if (query.object == null) return of({});
+  if (!query.isValidObject) return of({});
 
   const relationships: Record<string, Observable<EntityRelationship[]>> = {};
   const fromEntityName = query.object.type;
@@ -361,6 +329,8 @@ function getIncluded(
 ): Observable<Entity[]> {
   let set = [];
   const qo = query.object;
+
+  if (!query.isValidObject) return of(null);
 
   console.log(555, qo, relationships, Object.keys(relationships));
 

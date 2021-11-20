@@ -1,7 +1,7 @@
-import { Entity } from './interfaces/entities';
-import { EntitySetRelationship } from './interfaces/relationships';
+import { Entity } from '../interfaces/entities';
+import { EntitySetRelationship } from '../interfaces/relationships';
 
-import { entitySetRelationships } from './data';
+import { entitySetRelationships } from '../data';
 
 declare namespace FunctionLibrary {
   export type itemMap = (n: any) => any;

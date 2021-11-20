@@ -1,4 +1,4 @@
-import { compareFnGenerator } from '../dataService';
+import { compareFnGenerator } from '../services/dataService';
 import { Query } from './../interfaces/queries';
 
 import { query as academicSystems_filterById } from './academicSystems/filterById';
@@ -24,16 +24,11 @@ import { query as schools_includeDepth3 } from './schools/includeDepth3';
 import { query as schools_includeMultiple } from './schools/includeMultiple';
 import { query as schools_includeSingle } from './schools/includeSingle';
 
-// [done] TODO: minimal queries (cities-noParams)
-// [done] TODO: paging - (page[number], page[size] params
-// [done] TODO: sorting - sort param
-// [wip] TODO: free queries (e.g. path can be typed in)
-// [wip - jp, tue+wed] TODO: query error checking
-// [wip - jp, tue+wed] TODO: error responses
-// [jp, tue+wed] TODO: construct correct jsonApi
-// [later] TODO: multi-level queries (hard)
+// [wip] TODO: error responses
+// TODO: construct correct jsonApi
+// [assigned to AN] TODO: multi-level queries (hard)
 //    - [done] queries with 2 levels
-//    - [sun] queries with 3 levels
+//    - queries with 3 levels
 //    - queries with 4 levels
 //    - queries with n levels
 

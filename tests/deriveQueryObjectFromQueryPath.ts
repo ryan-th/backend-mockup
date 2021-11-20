@@ -1,6 +1,6 @@
 import { Test } from '.';
 import { QueryObject } from '../interfaces/queries';
-import { deriveQueryObjectFromQueryPath } from '../queryService';
+import { deriveQueryObjectFromQueryPath } from '../services/queryService';
 
 interface Test1 extends Test {
   inputs: string[];

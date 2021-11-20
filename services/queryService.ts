@@ -1,43 +1,21 @@
-import { entitySets } from './data';
-import { EntityName } from './interfaces/entities';
+import Ajv from 'ajv';
+import { ValidateFunction } from 'ajv/dist/core';
+import { entitySets } from '../data';
 import {
   AcademicSystemQueryObject,
   CityQueryObject,
   CountryQueryObject,
   Operator,
+  Query,
+  QueryError,
   QueryObject,
   QueryObjectKey,
   SchoolQueryObject,
-} from './interfaces/queries';
-import { QueryParamObject } from './tests/deriveQueryParamObjectFromQueryParamString';
-
-// TODO: move higher (match operators - for filtering)
-export function match_stringMatches(
-  value: string,
-  matchValue: string
-): boolean {
-  if (value === undefined) return true;
-  if (matchValue === undefined) return true;
-  return value.toLowerCase().startsWith(matchValue.toLowerCase());
-}
-
-export function match_stringEq(value: string, matchValue: string): boolean {
-  if (value === undefined) return true;
-  if (matchValue === undefined) return true;
-  return value.toLowerCase() === matchValue.toLowerCase();
-}
-
-export function match_numberEq(value: number, matchValue: number): boolean {
-  if (value === undefined) return true;
-  if (matchValue === undefined) return true;
-  return value === matchValue;
-}
-
-export function match_listIncludes(value: any, matchValue: any[]): boolean {
-  if (value === undefined || value === []) return true;
-  if (matchValue === undefined) return true;
-  return matchValue.includes(value);
-}
+} from '../interfaces/queries';
+import { cityQueryObjectSchema } from '../queries/schemas/cities';
+import { schoolQueryObjectSchema } from '../queries/schemas/schools';
+import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
+import { mergeObjects } from './genericServices';
 
 export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
   x.type === 'school';
@@ -51,6 +29,18 @@ export const isCountryQueryObject = (x: QueryObject): x is CountryQueryObject =>
 export const isAcademicSystemQueryObject = (
   x: QueryObject
 ): x is AcademicSystemQueryObject => x.type === 'academicSystem';
+
+export function deriveQueryFromQueryPath(queryPath: string): Query {
+  const queryObject = deriveQueryObjectFromQueryPath(queryPath);
+
+  // TODO: refactor
+  return {
+    slug: 'custom',
+    description: 'custom query',
+    path: queryPath,
+    object: queryObject,
+  };
+}
 
 export function deriveQueryObjectFromQueryPath(queryPath: string): QueryObject {
   // /cities/1 => { type: 'city', filter: { id: { in: [1] } } }
@@ -144,61 +134,37 @@ export function deriveQueryParamObjectFromQueryParamString(
   }
 }
 
-// https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
-// TODO: pick best one and improve
-// export default function mergeDeep(target: Object, source: Object): Object {
-//   function isObject(item: any) {
-//     return item && typeof item === 'object' && !Array.isArray(item);
-//   }
+interface Validators {
+  isValidCityQueryObject: ValidateFunction<unknown>;
+  isValidSchoolQueryObject: ValidateFunction<unknown>;
+}
 
-//   let output = Object.assign({}, target);
-//   if (isObject(target) && isObject(source)) {
-//     Object.keys(source).forEach((key) => {
-//       if (isObject(source[key])) {
-//         if (!(key in target)) Object.assign(output, { [key]: source[key] });
-//         else output[key] = mergeDeep(target[key], source[key]);
-//       } else {
-//         Object.assign(output, { [key]: source[key] });
-//       }
-//     });
-//   }
-//   return output;
-// }
+let validators: Validators;
 
-// TODO: add tests
-// TODO: move higher
-export const mergeObjects = <T extends object = object>(
-  target: T,
-  ...sources: T[]
-): T => {
-  if (!sources.length) {
-    return target;
-  }
-  const source = sources.shift();
-  if (source === undefined) {
-    return target;
+function getValidators() {
+  const ajv = new Ajv();
+  return {
+    isValidCityQueryObject: ajv.compile(cityQueryObjectSchema),
+    isValidSchoolQueryObject: ajv.compile(schoolQueryObjectSchema),
+  };
+}
+
+// TODO: add more cases; define behaviour; add more QueryError values
+export function validateQuery(query: Query): QueryError {
+  const qo: QueryObject = query.object;
+  if (!validators) validators = getValidators();
+
+  if (qo == null || qo.type === undefined) return { slug: 'invalid-resource' };
+
+  if (isCityQueryObject(qo)) {
+    const idValid = validators.isValidCityQueryObject(qo);
+    if (!idValid) return { slug: 'invalid-resource' };
   }
 
-  if (isMergebleObject(target) && isMergebleObject(source)) {
-    Object.keys(source).forEach(function (key: string) {
-      if (isMergebleObject(source[key])) {
-        if (!target[key]) {
-          target[key] = {};
-        }
-        mergeObjects(target[key], source[key]);
-      } else {
-        target[key] = source[key];
-      }
-    });
+  if (isSchoolQueryObject(qo)) {
+    const idValid = validators.isValidSchoolQueryObject(qo);
+    if (!idValid) return { slug: 'invalid-resource' };
   }
 
-  return mergeObjects(target, ...sources);
-};
-
-const isObject = (item: any): boolean => {
-  return item !== null && typeof item === 'object';
-};
-
-const isMergebleObject = (item: any): boolean => {
-  return isObject(item) && !Array.isArray(item);
-};
+  return null;
+}

@@ -1,81 +1,147 @@
-// TODO: change any to some jsonschema type
-export const schoolQueryObjectSchema: any = {
-  $schema: 'http://json-schema.org/draft-04/schema#',
-  type: 'object',
-  properties: {
-    type: {
+import { JSONSchema7 } from 'json-schema';
+
+//  derived locally using:
+// typescript-json-schema "interfaces/queries.ts" SchoolQueryObject --noExtraProps
+export const schoolQueryObjectSchema: JSONSchema7 = {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  additionalProperties: false,
+  definitions: {
+    EntityName: {
+      enum: ['academicSystem', 'city', 'country', 'school'],
       type: 'string',
     },
-    include: {
-      type: 'array',
-      items: [
-        {
-          type: 'string',
-        },
-        {
-          type: 'string',
-        },
-        {
-          type: 'string',
-        },
-      ],
-    },
-    fields: {
-      type: 'object',
+    FilterOperator: {
+      additionalProperties: false,
       properties: {
-        school: {
-          type: 'array',
-          items: [
-            {
-              type: 'string',
-            },
-          ],
+        gt: {
+          type: 'number',
         },
-        city: {
-          type: 'array',
-          items: [
-            {
-              type: 'string',
-            },
-          ],
+        gte: {
+          type: 'number',
         },
-        'city.country': {
-          type: 'array',
-          items: [
+        in: {
+          anyOf: [
             {
-              type: 'string',
-            },
-            {
-              type: 'string',
-            },
-          ],
-        },
-      },
-      required: ['school', 'city', 'city.country'],
-    },
-    filter: {
-      type: 'object',
-      properties: {
-        city: {
-          type: 'object',
-          properties: {
-            id: {
+              items: {
+                type: 'string',
+              },
               type: 'array',
-              items: [
-                {
-                  type: 'integer',
-                },
-                {
-                  type: 'integer',
-                },
-              ],
             },
-          },
-          required: ['id'],
+            {
+              items: {
+                type: 'number',
+              },
+              type: 'array',
+            },
+            {
+              items: {
+                type: 'boolean',
+              },
+              type: 'array',
+            },
+          ],
+        },
+        lt: {
+          type: 'number',
+        },
+        lte: {
+          type: 'number',
+        },
+        matches: {
+          type: 'string',
         },
       },
-      required: ['city'],
+      type: 'object',
+    },
+    QueryObjectPage: {
+      additionalProperties: false,
+      properties: {
+        number: {
+          type: 'number',
+        },
+        size: {
+          type: 'number',
+        },
+      },
+      type: 'object',
     },
   },
-  required: ['type', 'include', 'fields', 'filter'],
+  properties: {
+    fields: {
+      additionalProperties: false,
+      properties: {
+        academicSystem: {
+          items: {
+            enum: ['id', 'name'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+        city: {
+          items: {
+            enum: ['id', 'imageUrl', 'name', 'slug'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+        'city.country': {
+          items: {
+            enum: ['id', 'name', 'slug'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+        school: {
+          items: {
+            enum: ['cityId', 'hasBeenVisitedByTh', 'id', 'name', 'slug'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+      },
+      type: 'object',
+    },
+    filter: {
+      additionalProperties: false,
+      properties: {
+        cityId: {
+          $ref: '#/definitions/FilterOperator',
+        },
+        hasBeenVisitedByTh: {
+          $ref: '#/definitions/FilterOperator',
+        },
+        id: {
+          $ref: '#/definitions/FilterOperator',
+        },
+        name: {
+          $ref: '#/definitions/FilterOperator',
+        },
+      },
+      type: 'object',
+    },
+    include: {
+      items: {
+        enum: ['academicSystem', 'city', 'city.country', 'city.country.region'],
+        type: 'string',
+      },
+      type: 'array',
+    },
+    page: {
+      $ref: '#/definitions/QueryObjectPage',
+    },
+    schema: {
+      type: 'string',
+    },
+    sort: {
+      items: {
+        enum: ['cityId', 'hasBeenVisitedByTh', 'id', 'name', 'slug'],
+        type: 'string',
+      },
+      type: 'array',
+    },
+    type: {
+      $ref: '#/definitions/EntityName',
+    },
+  },
+  type: 'object',
 };

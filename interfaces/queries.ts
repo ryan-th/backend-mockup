@@ -2,6 +2,7 @@ import { AcademicSystem, City, Country, EntityName, School } from './entities';
 
 // generic
 export interface Query {
+  isValidObject?: boolean;
   slug: string;
   description?: string;
   path: string;

@@ -1,71 +1,147 @@
 import { JSONSchema7 } from 'json-schema';
 
+//  derived locally using:
+// typescript-json-schema "interfaces/queries.ts" CityQueryObject --noExtraProps
 export const cityQueryObjectSchema: JSONSchema7 = {
-  // $schema: 'http://json-schema.org/draft-04/schema#',
-  type: 'object',
-  properties: {
-    type: {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  additionalProperties: false,
+  definitions: {
+    EntityName: {
+      enum: ['academicSystem', 'city', 'country', 'school'],
       type: 'string',
     },
-    include: {
-      type: 'array',
-      items: [
-        {
+    FilterOperator: {
+      additionalProperties: false,
+      properties: {
+        gt: {
+          type: 'number',
+        },
+        gte: {
+          type: 'number',
+        },
+        in: {
+          anyOf: [
+            {
+              items: {
+                type: 'string',
+              },
+              type: 'array',
+            },
+            {
+              items: {
+                type: 'number',
+              },
+              type: 'array',
+            },
+            {
+              items: {
+                type: 'boolean',
+              },
+              type: 'array',
+            },
+          ],
+        },
+        lt: {
+          type: 'number',
+        },
+        lte: {
+          type: 'number',
+        },
+        matches: {
           type: 'string',
         },
-      ],
-      minItems: 1,
-      maxItems: 1,
-    },
-    fields: {
-      type: 'object',
-      properties: {
-        city: {
-          type: 'array',
-          items: [
-            {
-              type: 'string',
-            },
-          ],
-          minItems: 1,
-          maxItems: 1,
-        },
-        country: {
-          type: 'array',
-          items: [
-            {
-              type: 'string',
-            },
-          ],
-          minItems: 1,
-          maxItems: 1,
-        },
       },
-      required: [],
+      type: 'object',
+    },
+    QueryObjectPage: {
       additionalProperties: false,
-    },
-    filter: {
-      type: 'object',
       properties: {
-        id: {
-          type: 'object',
-          properties: {
-            in: {
-              type: 'array',
-              items: [
-                {
-                  type: 'integer',
-                },
-              ],
-              minItems: 1,
-              maxItems: 1,
-            },
-          },
+        number: {
+          type: 'number',
+        },
+        size: {
+          type: 'number',
         },
       },
-      required: ['id'],
+      type: 'object',
     },
   },
-  required: ['type'],
-  additionalProperties: false,
+  properties: {
+    fields: {
+      additionalProperties: false,
+      properties: {
+        city: {
+          items: {
+            enum: ['id', 'imageUrl', 'name', 'slug'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+        country: {
+          items: {
+            enum: ['id', 'name', 'slug'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+      },
+      type: 'object',
+    },
+    filter: {
+      additionalProperties: false,
+      properties: {
+        id: {
+          $ref: '#/definitions/FilterOperator',
+        },
+        imageUrl: {
+          $ref: '#/definitions/FilterOperator',
+        },
+        name: {
+          $ref: '#/definitions/FilterOperator',
+        },
+        slug: {
+          $ref: '#/definitions/FilterOperator',
+        },
+      },
+      type: 'object',
+    },
+    include: {
+      items: {
+        type: 'string',
+      },
+      type: 'array',
+    },
+    page: {
+      $ref: '#/definitions/QueryObjectPage',
+    },
+    schema: {
+      type: 'string',
+    },
+    sort: {
+      items: {
+        enum: [
+          '-country.id',
+          '-country.name',
+          '-country.slug',
+          '-id',
+          '-imageUrl',
+          '-name',
+          '-slug',
+          'country.id',
+          'country.name',
+          'country.slug',
+          'id',
+          'imageUrl',
+          'name',
+          'slug',
+        ],
+        type: 'string',
+      },
+      type: 'array',
+    },
+    type: {
+      $ref: '#/definitions/EntityName',
+    },
+  },
+  type: 'object',
 };

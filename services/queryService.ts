@@ -155,9 +155,17 @@ function deriveJsonApiErrorObjectFromAjvErrorObject(
 ): JsonApiErrorObject {
   // TODO: this is WIP
   const params = JSON.stringify(ajv.params);
-  const title = `${ajv.message} (${ajv.instancePath}, ${params})`;
+  const title = `${ajv.message} (${params})`;
   const detail = JSON.stringify(ajv);
-  return { id: 'WIP: ' + ajv.keyword, title: title, detail: detail };
+  const source = {
+    parameter: `${ajv.instancePath}, ${ajv.params.additionalProperty}`,
+  };
+  return {
+    id: 'WIP: ' + ajv.keyword,
+    title: title,
+    source: source,
+    detail: detail,
+  };
 }
 
 // TODO: add more cases; define behaviour; add more QueryError values

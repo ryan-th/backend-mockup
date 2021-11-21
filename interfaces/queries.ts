@@ -2,12 +2,13 @@ import { AcademicSystem, City, Country, EntityName, School } from './entities';
 import { Errors } from './jsonapi-typescript';
 
 // generic
+export type QueryPath = string;
 
 // TODO: consider refactoring
 export interface Query {
   slug: string;
   description?: string;
-  path: string;
+  path: QueryPath;
   object: QueryObject;
 
   // WIP
@@ -25,6 +26,8 @@ export type Operator = 'matches' | 'lt' | 'lte' | 'gt' | 'gte' | 'in';
 
 export interface QueryObject {
   type: EntityName;
+
+  // TODO: schema param so e.g. admin can request school view
   schema?: string;
   fields?: {};
   filter?: {};

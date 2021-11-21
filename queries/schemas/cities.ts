@@ -2,6 +2,8 @@ import { JSONSchema7 } from 'json-schema';
 
 //  derived locally using:
 // typescript-json-schema "interfaces/queries.ts" CityQueryObject --noExtraProps
+
+// TODO: add schemas from different perspectives (e.g. admin, school, teacher, etc.)
 export const cityQueryObjectSchema: JSONSchema7 = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   additionalProperties: false,

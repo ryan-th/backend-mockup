@@ -1,15 +1,18 @@
 import { AcademicSystem, City, Country, EntityName, School } from './entities';
 import { Errors } from './3rd-party/jsonapi-typescript';
 
+// TODO: consider splitting file
+
 // generic
 export type QueryPath = string;
 
 // TODO: consider refactoring
 export interface Query {
   slug: string;
-  description?: string;
+  status: 'TODO' | 'WIP' | 'Done';
   path: QueryPath;
-  object: QueryObject;
+  description?: string;
+  object?: QueryObject;
 
   // WIP
   isValidObject?: boolean;
@@ -104,10 +107,13 @@ export interface CityQueryObject extends QueryObject {
     country?: (keyof Country)[];
   };
   filter?: {
+    // TODO: look into whether this can be generic in typescript (using City keys)
     id?: FilterOperator;
     name?: FilterOperator;
     slug?: FilterOperator;
     imageUrl?: FilterOperator;
+    'country.id'?: FilterOperator;
+    'country.name'?: FilterOperator;
     // score?: FilterOperator;
     // hasBeenVisitedByTh?: FilterOperator;
     // description?: FilterOperator;

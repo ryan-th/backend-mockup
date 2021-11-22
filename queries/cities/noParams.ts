@@ -1,11 +1,7 @@
-import { CityQueryObject, Query } from '../../interfaces/queries';
-
-const queryObject: CityQueryObject = {
-  type: 'city',
-};
+import { Query } from '../../interfaces/queries';
 
 export const query: Query = {
   slug: 'cities-noParams',
   path: '/cities',
-  object: queryObject,
+  status: 'Done',
 };

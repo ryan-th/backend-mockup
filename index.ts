@@ -44,9 +44,11 @@ function setHtml() {
     const querySlug = select.options[select.selectedIndex].innerText;
     const query = queries.find((x) => x.slug === querySlug);
     label.hidden = true;
-    if (query.description) {
+    if (query.status || query.description) {
       label.hidden = false;
-      label.innerText = query.description;
+      label.innerText = `${query.status || ''}${
+        query.description ? ' - ' + query.description : ''
+      }`;
     }
     input.value = query.path;
   }
@@ -82,3 +84,25 @@ function setObservables() {
     switchMap((queryPath) => getResponseFromRequest$(queryPath))
   );
 }
+
+/* NOTES
+  - Concepts to make use of in real backend (and their location in this mockup):
+    + testing infrastructure (/tests)
+    + query validation
+      * json-schema (queries/schemas https://github.com/YousefED/typescript-json-schema)
+      * ajv (services/queryService.ts - validateQuery)
+    + json api response (interfaces/3rd-party, services/mainService.ts - deriveJsonApi)
+  - TODO RR(+JP)
+    - spec error responses (with tests - i.e. TDD)
+    - response codes
+    - meta data (e.g. record/page count - see https://jsonapi.org/examples/#pagination)
+    - see rough plan below
+    - add sql derivation
+    - filter by related entities
+  - Rough plan
+    + phase 1 - GETs (all use cases, up to depth 2)
+    + phase 1b - implement properly on beta (full proof of concept)
+    + phase 2 - simple POSTs, PUTs and DELETEs
+    + phase 3 - GETs (up to depth N?) [AN working on]
+    + phase x - more complex GETs, POSTs, PUTs and DELETEs - as needed
+*/

@@ -1,17 +1,7 @@
-import { AcademicSystemQueryObject, Query } from '../../interfaces/queries';
-
-const queryObject: AcademicSystemQueryObject = {
-  type: 'academicSystem',
-  fields: {
-    academicSystem: ['name'],
-  },
-  filter: {
-    id: [2, 4],
-  },
-};
+import { Query } from '../../interfaces/queries';
 
 export const query: Query = {
   slug: 'academicSystems-filterById',
   path: '/academicSystems?filter[id]=2,4',
-  object: queryObject,
+  status: 'Done',
 };

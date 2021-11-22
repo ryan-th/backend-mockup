@@ -3,11 +3,13 @@ import { Query } from './../interfaces/queries';
 
 import { query as academicSystems_filterById } from './academicSystems/filterById';
 
+// TODO RR: these are simpler now, so can all be in one file (e.g. cities.ts)
 import { query as cities_allParams } from './cities/allParams';
 import { query as cities_customFields } from './cities/customFields';
 import { query as cities_filterById } from './cities/filterById';
 import { query as cities_getById } from './cities/getById';
 import { query as cities_includeCountry } from './cities/includeCountry';
+import { query as cities_inPortugal } from './cities/inPortugal';
 import { query as cities_nameMatch } from './cities/nameMatch';
 import { query as cities_noParams } from './cities/noParams';
 import { query as cities_page1 } from './cities/page1';
@@ -34,7 +36,7 @@ const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
 
 function getQueries(): Query[] {
   // edit this to whichever query you're currently working on
-  const defaultQuery = cities_includeCountry;
+  const defaultQuery = cities_inPortugal;
 
   let queries: Query[] = [
     academicSystems_filterById,
@@ -44,6 +46,7 @@ function getQueries(): Query[] {
     cities_filterById,
     cities_getById,
     cities_includeCountry,
+    cities_inPortugal,
     cities_nameMatch,
     cities_noParams,
     cities_page1,

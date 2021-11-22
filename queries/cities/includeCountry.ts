@@ -1,15 +1,6 @@
-import { CityQueryObject, Query } from '../../interfaces/queries';
+import { Query } from '../../interfaces/queries';
 
-const queryObject: CityQueryObject = {
-  type: 'city',
-  include: ['country'],
-  fields: {
-    city: ['name'],
-    country: ['slug'],
-  },
-  filter: {
-    id: [1, 2],
-    /*
+/* filtering notes and ideas
     // cities in Portugal or China
     country: {
       id: [2,5]
@@ -31,7 +22,7 @@ const queryObject: CityQueryObject = {
       }
     }
     
-    // cities in regions which a population of more than 1B
+    // cities in regions which have a population of more than 1B
     country: {
       region: {
         population: {
@@ -48,8 +39,6 @@ const queryObject: CityQueryObject = {
       }
     }
 */
-  },
-};
 
 /*
 path: `/cities?fields[city]=name&include=country&fields[country]=slug&filter[id]=1,2
@@ -68,5 +57,5 @@ path: `/cities?fields[city]=name&include=country&fields[country]=slug&filter[id]
 export const query: Query = {
   slug: 'cities-includeCountry',
   path: '/cities?fields[city]=name&include=country&fields[country]=slug&filter[id]=1,2',
-  object: queryObject,
+  status: 'Done',
 };

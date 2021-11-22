@@ -69,7 +69,7 @@ export const entitySetRelationships: EntitySetRelationship[] = [
     fromEntityName: 'school',
     toEntityName: 'city',
     data: schoolCities,
-    sqlFrom: '',
+    sqlFrom: 'INNER JOIN aCountries co ON ci.countryId = co.id',
   },
   {
     name: 'cityCountries',

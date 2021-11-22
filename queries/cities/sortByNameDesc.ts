@@ -1,12 +1,7 @@
-import { CityQueryObject, Query } from '../../interfaces/queries';
-
-const queryObject: CityQueryObject = {
-  type: 'city',
-  sort: ['-name'],
-};
+import { Query } from '../../interfaces/queries';
 
 export const query: Query = {
   slug: 'cities-sortByNameDesc',
   path: '/cities?sort=-name',
-  object: queryObject,
+  status: 'Done',
 };

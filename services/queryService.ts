@@ -23,11 +23,11 @@ import { mergeObjects } from './genericServices';
 // TODO
 import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
 
-// TODO: move higher
-interface Validators {
-  isValidCityQueryObject: ValidateFunction<unknown>;
-  isValidSchoolQueryObject: ValidateFunction<unknown>;
-}
+// // TODO: move higher
+// interface Validators {
+//   isValidCityQueryObject: ValidateFunction<unknown>;
+//   isValidSchoolQueryObject: ValidateFunction<unknown>;
+// }
 
 export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
   x.type === 'school';

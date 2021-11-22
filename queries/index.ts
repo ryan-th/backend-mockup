@@ -1,30 +1,11 @@
-import { compareFnGenerator } from '../services/dataService';
 import { Query } from './../interfaces/queries';
 
-import { query as academicSystems_filterById } from './academicSystems/filterById';
+import { compareFnGenerator } from '../services/dataService';
 
-// TODO RR: these are simpler now, so can all be in one file (e.g. cities.ts)
-import { query as cities_allParams } from './cities/allParams';
-import { query as cities_customFields } from './cities/customFields';
-import { query as cities_filterById } from './cities/filterById';
-import { query as cities_getById } from './cities/getById';
-import { query as cities_includeCountry } from './cities/includeCountry';
-import { query as cities_inPortugal } from './cities/inPortugal';
-import { query as cities_nameMatch } from './cities/nameMatch';
-import { query as cities_noParams } from './cities/noParams';
-import { query as cities_page1 } from './cities/page1';
-import { query as cities_page2 } from './cities/page2';
-import { query as cities_sortByName } from './cities/sortByName';
-import { query as cities_sortByNameDesc } from './cities/sortByNameDesc';
-
-import { query as countries_filterById } from './countries/filterById';
-
-import { query as schools_includeComplex1 } from './schools/includeComplex1';
-import { query as schools_includeComplex2 } from './schools/includeComplex2';
-import { query as schools_includeDepth2 } from './schools/includeDepth2';
-import { query as schools_includeDepth3 } from './schools/includeDepth3';
-import { query as schools_includeMultiple } from './schools/includeMultiple';
-import { query as schools_includeSingle } from './schools/includeSingle';
+import { getAcademicSystemQueries } from './academicSystems';
+import { getCityQueries } from './cities';
+import { getCountryQueries } from './countries';
+import { getSchoolQueries } from './schools';
 
 // TODO: move higher
 const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
@@ -36,38 +17,21 @@ const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
 
 function getQueries(): Query[] {
   // edit this to whichever query you're currently working on
-  const defaultQuery = cities_inPortugal;
+  const defaultQuerySlug = 'cities-inPortugal';
 
   let queries: Query[] = [
-    academicSystems_filterById,
-
-    cities_allParams,
-    cities_customFields,
-    cities_filterById,
-    cities_getById,
-    cities_includeCountry,
-    cities_inPortugal,
-    cities_nameMatch,
-    cities_noParams,
-    cities_page1,
-    cities_page2,
-    cities_sortByName,
-    cities_sortByNameDesc,
-
-    countries_filterById,
-
-    schools_includeComplex1,
-    schools_includeComplex2,
-    schools_includeDepth2,
-    schools_includeDepth3,
-    schools_includeMultiple,
-    schools_includeSingle,
+    ...getAcademicSystemQueries(),
+    ...getCityQueries(),
+    ...getCountryQueries(),
+    ...getSchoolQueries(),
   ];
 
   const compareFn = compareFnGenerator<Query>(['slug']);
   queries = queries.sort(compareFn);
 
-  const defaultQueryIndex = queries.findIndex((x) => x === defaultQuery);
+  const defaultQueryIndex = queries.findIndex(
+    (x) => x.slug === defaultQuerySlug
+  );
   queries = list_moveItem(queries, defaultQueryIndex, 0);
 
   return queries;

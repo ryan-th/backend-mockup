@@ -24,27 +24,6 @@ import { query as schools_includeDepth3 } from './schools/includeDepth3';
 import { query as schools_includeMultiple } from './schools/includeMultiple';
 import { query as schools_includeSingle } from './schools/includeSingle';
 
-// [wip] TODO: error responses
-// TODO: construct correct jsonApi
-// [assigned to AN] TODO: multi-level queries (hard)
-//    - [done] queries with 2 levels
-//    - queries with 3 levels
-//    - queries with 4 levels
-//    - queries with n levels
-
-// const schoolQuery_cityQuery: CityQueryObject = {
-//   // path: undefined,
-//   type: 'city',
-//   include: ['country'],
-//   fields: {
-//     city: ['name'],
-//     country: ['name', 'slug'],
-//   },
-//   filter: {
-//     id: [1, 2],
-//   },
-// };
-
 // TODO: move higher
 const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
   const clone = [...list];
@@ -55,7 +34,7 @@ const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
 
 function getQueries(): Query[] {
   // edit this to whichever query you're currently working on
-  const defaultQuery = cities_noParams;
+  const defaultQuery = cities_includeCountry;
 
   let queries: Query[] = [
     academicSystems_filterById,

@@ -1,4 +1,4 @@
-import { Test } from '.';
+import { BaseTest } from '.';
 import { deriveQueryParamObjectFromQueryParamString } from '../services/queryService';
 
 // TODO: move
@@ -37,7 +37,7 @@ interface TestQueryParamObject extends QueryParamObject {
   };
 }
 
-interface Test1 extends Test {
+interface Test extends BaseTest {
   inputs: string[];
   expect: TestQueryParamObject;
   result?: TestQueryParamObject;
@@ -45,8 +45,8 @@ interface Test1 extends Test {
   note?: string;
 }
 
-export function getTestResults(): Test[] {
-  const tests: Test1[] = [
+export function getTestResults(): BaseTest[] {
+  const tests: Test[] = [
     {
       inputs: [undefined],
       expect: undefined,

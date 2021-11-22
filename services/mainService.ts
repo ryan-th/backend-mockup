@@ -4,7 +4,7 @@ import { switchMap } from 'rxjs/operators';
 
 // interfaces
 import { City, Entity, EntityName, EntitySet } from '../interfaces/entities';
-import { Query, QueryObject } from '../interfaces/queries';
+import { Query, QueryObject, QueryPath } from '../interfaces/queries';
 import {
   EntityRelationship,
   EntitySetRelationshipName,
@@ -28,9 +28,14 @@ import {
   isSchoolQueryObject,
   validateQuery,
 } from './queryService';
+import { JsonApiDocument } from '../interfaces/responses';
+import {
+  PrimaryData,
+  ResourceObject,
+} from '../interfaces/3rd-party/jsonapi-typescript';
 
-export function getResponseFromRequest$(queryPath: string): Observable<any> {
-  const deriveQuery$ = (queryPath: string) => {
+export function getResponseFromRequest$(queryPath: QueryPath): Observable<any> {
+  const deriveQuery$ = (queryPath: QueryPath) => {
     console.log('queryPath:', queryPath);
     const query = deriveQueryFromQueryPath(queryPath);
     return combineLatest([of(query)]);
@@ -233,14 +238,14 @@ function getListRelationships(
   const fromEntityName = query.object.type;
 
   query.object.include?.forEach((toEntityName) => {
-    console.log(111, toEntityName);
+    // console.log(111, toEntityName);
     if (toEntityName.includes('.')) return;
 
     const listRelationship = getEntitySetRelationship(
       fromEntityName,
       toEntityName
     );
-    console.log(99, listRelationship);
+    // console.log(99, listRelationship);
     // const subQuery = deriveSubQuery(query, entityName);
     const filteredRelationship = listRelationship.data.filter((x) =>
       listIds.includes(x.fromId)
@@ -264,7 +269,7 @@ function getIncluded(
 
   if (!query.isValidObject) return of(null);
 
-  console.log(555, qo, relationships, Object.keys(relationships));
+  // console.log(555, qo, relationships, Object.keys(relationships));
 
   Object.keys(relationships).forEach((key) => {
     const listRelationship = entitySetRelationships.find((x) => x.name === key);
@@ -278,20 +283,20 @@ function getIncluded(
     const fieldNames: string[] =
       qo.fields?.[listRelationship.toEntityName] ||
       entitySet.defaultPropertyNames;
-    console.log(333, entitySet, listRelationship.toEntityName, fieldNames);
+    // console.log(333, entitySet, listRelationship.toEntityName, fieldNames);
     subset = entitiesPluck(subset, fieldNames);
 
     const children = qo.include.filter((x) =>
       x.startsWith(listRelationship.toEntityName + '.')
     );
 
-    console.log(77, children, query);
+    // console.log(77, children, query);
 
-    console.log(
-      222,
-      key,
-      subset.map((x) => x.id)
-    );
+    // console.log(
+    //   222,
+    //   key,
+    //   subset.map((x) => x.id)
+    // );
     set = [...set, ...subset];
   });
 
@@ -305,12 +310,58 @@ function deriveJsonApi(
   entitySet: EntitySet,
   relationships: {} | Record<EntityName, EntityRelationship[]>,
   included: Entity[]
-): any {
-  return {
-    isValidRequest: query.isValidObject,
-    errors: query.errors,
-    data: entitySet?.data,
-    relationships: relationships,
-    included: included,
+): JsonApiDocument {
+  // console.log(13, included);
+  if (!query.isValidObject) {
+    return {
+      errors: query.errors,
+    };
+  }
+  // TODO: remove hard-coding
+  const data = <PrimaryData>entitySet.data.map(({ id, ...rest }) => {
+    const item: Partial<ResourceObject<any, any>> = {
+      type: query.object.type,
+      id: id.toString(),
+    };
+    if (rest) item.attributes = rest;
+    if (Object.keys(relationships).length > 0) {
+      item.relationships = {};
+
+      const cityCountry = relationships['cityCountries']?.find(
+        (rel: EntityRelationship) => id === rel.fromId
+      );
+
+      if (cityCountry) {
+        item.relationships.country = {
+          data: {
+            type: 'country',
+            id: cityCountry.toId.toString(),
+          },
+        };
+      }
+
+      // .map((rel: EntityRelationship) => {
+      //   return {
+      //     country: {
+      //       data: { type: 'country', id: rel.toId.toString() },
+      //     },
+      //   };
+      // });
+    }
+
+    return item;
+  });
+  const included2 = included.map(({ id, ...rest }) => {
+    const item: ResourceObject<string, any> = {
+      type: 'country',
+      id: id.toString(),
+    };
+    if (rest) item.attributes = rest;
+    return item;
+  });
+  const jsonApiDocument: JsonApiDocument = {
+    data: data,
   };
+  if (included2.length > 0) jsonApiDocument.included = included2;
+  return jsonApiDocument;
 }

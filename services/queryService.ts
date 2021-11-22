@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import { ErrorObject as AjvErrorObject, ValidateFunction } from 'ajv/dist/core';
-import { entitySets } from '../data';
-import { ErrorObject as JsonApiErrorObject } from '../interfaces/jsonapi-typescript';
+
+// interfaces
 import {
   AcademicSystemQueryObject,
   CityQueryObject,
@@ -12,25 +12,21 @@ import {
   QueryObjectKey,
   SchoolQueryObject,
 } from '../interfaces/queries';
-import { cityQueryObjectSchema } from '../queries/schemas/cities';
-import { schoolQueryObjectSchema } from '../queries/schemas/schools';
-import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
+import { JsonApiErrorObject } from '../interfaces/responses';
+
+// data
+import { entitySets } from '../data';
+
+// services
 import { mergeObjects } from './genericServices';
+
+// TODO
+import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
 
 // TODO: move higher
 interface Validators {
   isValidCityQueryObject: ValidateFunction<unknown>;
   isValidSchoolQueryObject: ValidateFunction<unknown>;
-}
-
-let _validators: Validators;
-
-function getValidators() {
-  const ajv = new Ajv();
-  return {
-    isValidCityQueryObject: ajv.compile(cityQueryObjectSchema),
-    isValidSchoolQueryObject: ajv.compile(schoolQueryObjectSchema),
-  };
 }
 
 export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
@@ -180,7 +176,7 @@ export function validateQuery(query: Query): JsonApiErrorObject[] {
   const entitySet = entitySets.find((x) => x.entityName === qo.type);
 
   const ajv = new Ajv();
-  const validateQueryObject = ajv.compile(entitySet.querySchema);
+  const validateQueryObject = ajv.compile(entitySet.querySchema || {});
   const isValid = validateQueryObject(qo);
   if (isValid) return null;
 
@@ -189,7 +185,7 @@ export function validateQuery(query: Query): JsonApiErrorObject[] {
     deriveJsonApiErrorObjectFromAjvErrorObject(ajvErrorObject)
   );
 
-  console.log(88, ajvErrorObjects, jsonApiErrorObjects);
+  // console.log(88, ajvErrorObjects, jsonApiErrorObjects);
 
   return jsonApiErrorObjects;
 }

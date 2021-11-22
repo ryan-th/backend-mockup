@@ -1,0 +1,201 @@
+import { combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { BaseTest } from '.';
+import { JsonApiDocument } from '../interfaces/responses';
+import { getResponseFromRequest$ } from '../services/mainService';
+
+interface Test extends BaseTest {
+  inputs: string[];
+  expect: JsonApiDocument;
+  result?: JsonApiDocument;
+  isSuccess?: boolean;
+  note?: string;
+}
+
+export function getTestResults$(): Observable<Test[]> {
+  const tests: Test[] = [
+    {
+      inputs: ['/cities'],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+              slug: 'city-slug-1',
+            },
+          },
+          {
+            type: 'city',
+            id: '2',
+            attributes: {
+              name: 'Beijing',
+              slug: 'city-slug-2',
+            },
+          },
+          {
+            type: 'city',
+            id: '23',
+            attributes: {
+              name: 'Cairo',
+              slug: 'city-slug-3',
+            },
+          },
+        ],
+      },
+    },
+    {
+      inputs: ['/cities?fields[city]=imageUrl'],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              imageUrl: 'city-imageUrl-1',
+            },
+          },
+          {
+            type: 'city',
+            id: '2',
+            attributes: {},
+          },
+          {
+            type: 'city',
+            id: '23',
+            attributes: {
+              imageUrl: 'city-imageUrl-3',
+            },
+          },
+        ],
+      },
+    },
+    {
+      inputs: [
+        '/cities?fields[city]=name&include=country&fields[country]=slug&filter[id]=1,2',
+      ],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+            },
+            relationships: {
+              country: {
+                data: { type: 'country', id: '5' },
+              },
+            },
+          },
+          {
+            type: 'city',
+            id: '2',
+            attributes: {
+              name: 'Beijing',
+            },
+            relationships: {
+              country: {
+                data: { type: 'country', id: '6' },
+              },
+            },
+          },
+        ],
+        included: [
+          {
+            type: 'country',
+            id: '5',
+            attributes: {
+              slug: 'country-slug-1',
+            },
+          },
+          {
+            type: 'country',
+            id: '6',
+            attributes: {
+              slug: 'country-slug-2',
+            },
+          },
+        ],
+      },
+    },
+    {
+      inputs: [
+        '/cities?fields[city]=name&include=country&fields[country]=slug&filter[id]=1,2',
+      ],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+            },
+            relationships: {
+              country: {
+                data: {
+                  type: 'country',
+                  id: '5',
+                },
+              },
+            },
+          },
+          {
+            type: 'city',
+            id: '2',
+            attributes: {
+              name: 'Beijing',
+            },
+            relationships: {
+              country: {
+                data: {
+                  type: 'country',
+                  id: '6',
+                },
+              },
+            },
+          },
+        ],
+        included: [
+          {
+            type: 'country',
+            id: '5',
+            attributes: {
+              slug: 'country-slug-1',
+            },
+          },
+          {
+            type: 'country',
+            id: '6',
+            attributes: {
+              slug: 'country-slug-2',
+            },
+          },
+        ],
+      },
+    },
+    // TODO: add more tests
+  ];
+
+  const checkResult = (test: Test, result: JsonApiDocument): Test => {
+    test.functionName = 'getResponseFromRequest$';
+    test.result = <JsonApiDocument>result;
+    const strResult = JSON.stringify(test.result);
+    const strExpect = JSON.stringify(test.expect);
+    test.isSuccess = strResult === strExpect;
+    if (!test.isSuccess) console.log(15, strResult, strExpect);
+
+    return test;
+  };
+
+  const tests$: Observable<any>[] = tests.map((test) => {
+    return getResponseFromRequest$
+      .call(this, ...test.inputs)
+      .pipe(map((result: JsonApiDocument) => checkResult(test, result)));
+  });
+
+  const results$ = combineLatest(tests$);
+
+  return results$;
+}

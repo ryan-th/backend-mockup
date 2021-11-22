@@ -1,8 +1,8 @@
-import { Test } from '.';
+import { BaseTest } from '.';
 import { QueryObject } from '../interfaces/queries';
 import { deriveQueryObjectFromQueryPath } from '../services/queryService';
 
-interface Test1 extends Test {
+interface Test extends BaseTest {
   inputs: string[];
   expect: QueryObject;
   result?: QueryObject;
@@ -10,8 +10,8 @@ interface Test1 extends Test {
   note?: string;
 }
 
-export function getTestResults(): Test[] {
-  const tests: Test1[] = [
+export function getTestResults(): BaseTest[] {
+  const tests: Test[] = [
     {
       inputs: ['/cities'],
       expect: {

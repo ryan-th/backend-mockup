@@ -1,7 +1,7 @@
-import { Test } from '.';
+import { BaseTest } from '.';
 import { parseToTypedValue } from '../services/queryService';
 
-interface Test1 extends Test {
+interface Test extends BaseTest {
   inputs: string[];
   expect: boolean | number | string;
   result?: boolean | number | string;
@@ -9,8 +9,8 @@ interface Test1 extends Test {
   note?: string;
 }
 
-export function getTestResults(): Test[] {
-  const tests: Test1[] = [
+export function getTestResults(): BaseTest[] {
+  const tests: Test[] = [
     {
       inputs: [undefined],
       expect: undefined,

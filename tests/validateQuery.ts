@@ -1,11 +1,11 @@
-import { Test } from '.';
+import { BaseTest } from '.';
 import { Query, QueryError } from '../interfaces/queries';
 import {
   deriveQueryFromQueryPath,
   validateQuery,
 } from '../services/queryService';
 
-interface Test1 extends Test {
+interface Test extends BaseTest {
   inputs: Query[];
   expect: QueryError;
   result?: QueryError;
@@ -13,9 +13,9 @@ interface Test1 extends Test {
   note?: string;
 }
 
-export function getTestResults(): Test[] {
+export function getTestResults(): BaseTest[] {
   const prepare = deriveQueryFromQueryPath;
-  const tests: Test1[] = [
+  const tests: Test[] = [
     {
       inputs: [prepare('/cities')],
       expect: null,

@@ -272,28 +272,36 @@ function getIncluded(
 ): Observable<Entity[]> {
   let set = [];
   const qo = query.object;
+  const entityRelationships = relationships;
 
   if (!query.isValidObject) return of(null);
 
   // console.log(555, qo, relationships, Object.keys(relationships));
 
-  Object.keys(relationships).forEach((key) => {
-    const listRelationship = entitySetRelationships.find((x) => x.name === key);
-    const entitySet = entitySets.find(
-      (x) => x.entityName === listRelationship.toEntityName
+  Object.keys(entityRelationships).forEach((entitySetRelationshipName) => {
+    const entitySetRelationship = entitySetRelationships.find(
+      (x) => x.name === entitySetRelationshipName
     );
-    const toIds = [...new Set(relationships[key].map((x) => x.toId))];
+    const entitySet = entitySets.find(
+      (x) => x.entityName === entitySetRelationship.toEntityName
+    );
+    const toIds = [
+      ...new Set(
+        entityRelationships[entitySetRelationshipName].map((x) => x.toId)
+      ),
+    ];
     let subset = entitySet.data.filter((x) => toIds.includes(x.id));
 
     // pluck requested fields
     const fieldNames: string[] =
-      qo.fields?.[listRelationship.toEntityName] ||
+      qo.fields?.[entitySetRelationship.toEntityName] ||
       entitySet.defaultPropertyNames;
-    // console.log(333, entitySet, listRelationship.toEntityName, fieldNames);
+    // console.log(333, entitySet, entitySetRelationship.toEntityName, fieldNames);
     subset = entitiesPluck(subset, fieldNames);
+    subset.forEach((x) => (x['type'] = entitySet.entityName));
 
     const children = qo.include.filter((x) =>
-      x.startsWith(listRelationship.toEntityName + '.')
+      x.startsWith(entitySetRelationship.toEntityName + '.')
     );
 
     // console.log(77, children, query);
@@ -317,7 +325,6 @@ function deriveJsonApi(
   relationships: {} | Record<EntityName, EntityRelationship[]>,
   included: Entity[]
 ): JsonApiDocument {
-  // console.log(13, included);
   if (!query.isValidObject) {
     return {
       errors: query.errors,
@@ -330,36 +337,32 @@ function deriveJsonApi(
       id: id.toString(),
     };
     if (rest) item.attributes = rest;
-    if (Object.keys(relationships).length > 0) {
-      item.relationships = {};
 
-      const cityCountry = relationships['cityCountries']?.find(
-        (rel: EntityRelationship) => id === rel.fromId
+    Object.keys(relationships).forEach((key) => {
+      if (!item.relationships) item.relationships = {};
+
+      const entitySetRelationship = entitySetRelationships.find(
+        (x) => x.name === key
       );
 
-      if (cityCountry) {
-        item.relationships.country = {
+      const entityRelationship = relationships[key]?.find(
+        (rel: EntityRelationship) => id === rel.fromId
+      );
+      if (entityRelationship) {
+        item.relationships[entitySetRelationship.toEntityName] = {
           data: {
-            type: 'country',
-            id: cityCountry.toId.toString(),
+            type: entitySetRelationship.toEntityName,
+            id: entityRelationship.toId.toString(),
           },
         };
       }
-
-      // .map((rel: EntityRelationship) => {
-      //   return {
-      //     country: {
-      //       data: { type: 'country', id: rel.toId.toString() },
-      //     },
-      //   };
-      // });
-    }
+    });
 
     return item;
   });
-  const included2 = included.map(({ id, ...rest }) => {
+  const included2 = included.map(({ id, type, ...rest }) => {
     const item: ResourceObject<string, any> = {
-      type: 'country',
+      type: type,
       id: id.toString(),
     };
     if (rest) item.attributes = rest;

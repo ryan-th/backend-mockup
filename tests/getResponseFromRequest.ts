@@ -252,6 +252,63 @@ export function getTestResults$(): Observable<Test[]> {
         ],
       },
     },
+    {
+      inputs: ['/schools?include=city&filter[id]=2848,1923'],
+      expect: {
+        data: [
+          {
+            type: 'school',
+            id: '2848',
+            attributes: {
+              name: 'Academie Laurentienne',
+              slug: 'school-slug-1',
+            },
+            relationships: {
+              city: {
+                data: {
+                  type: 'city',
+                  id: '1',
+                },
+              },
+            },
+          },
+          {
+            type: 'school',
+            id: '1923',
+            attributes: {
+              name: 'Bar',
+              slug: 'school-slug-3',
+            },
+            relationships: {
+              city: {
+                data: {
+                  type: 'city',
+                  id: '23',
+                },
+              },
+            },
+          },
+        ],
+        included: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+              slug: 'city-slug-1',
+            },
+          },
+          {
+            type: 'city',
+            id: '23',
+            attributes: {
+              name: 'Cairo',
+              slug: 'city-slug-3',
+            },
+          },
+        ],
+      },
+    },
     // {
     //   inputs: ['/cities'],
     //   expect: {},

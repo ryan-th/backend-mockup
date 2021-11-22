@@ -17,7 +17,7 @@ const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
 
 function getQueries(): Query[] {
   // edit this to whichever query you're currently working on
-  const defaultQuerySlug = 'cities-inPortugal';
+  const defaultQuerySlug = 'schools-includeSingle';
 
   let queries: Query[] = [
     ...getAcademicSystemQueries(),

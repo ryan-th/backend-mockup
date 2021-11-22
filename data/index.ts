@@ -2,14 +2,17 @@
 import { EntitySet } from '../interfaces/entities';
 import { EntitySetRelationship } from '../interfaces/relationships';
 
-// data
+// entity-sets
 import {
   academicSystems,
   defaultAcademicSystemPropertyNames,
-} from './academicSystems';
-import { cities, defaultCityPropertyNames } from './cities';
-import { countries, defaultCountryPropertyNames } from './countries';
-import { defaultSchoolPropertyNames, schools } from './schools';
+} from './entity-sets/academicSystems';
+import { cities, defaultCityPropertyNames } from './entity-sets/cities';
+import {
+  countries,
+  defaultCountryPropertyNames,
+} from './entity-sets/countries';
+import { defaultSchoolPropertyNames, schools } from './entity-sets/schools';
 
 // relationships
 import { cityCountries } from './relationships/cityCountries';

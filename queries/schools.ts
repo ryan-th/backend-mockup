@@ -7,9 +7,10 @@ export function getSchoolQueries(): Query[] {
 const queries: Query[] = [
   {
     slug: 'schools-includeComplex1',
-    description: 'WIP',
     path: '/schools?fields[school]=name,hasBeenVisitedByTh&filter[city.id]=1,2&include=city,academicSystem&fields[city]=name',
     status: 'TODO',
+    description:
+      'shouldn`t error (json-schema additions needed); filtering on related entities needed',
   },
   {
     slug: 'schools-includeComplex2',
@@ -18,26 +19,24 @@ const queries: Query[] = [
   },
   {
     slug: 'schools-includeDepth2',
-    description: 'WIP',
     path: '/schools?include=city,city.country',
     status: 'TODO',
   },
   {
     slug: 'schools-includeDepth3',
-    description: 'WIP',
     path: '/schools?include=city,city.country,city.country.region',
-    status: 'TODO',
+    status: 'WIP',
+    description: 'hard; with AN',
   },
   {
     slug: 'schools-includeMultiple',
-    description: 'WIP',
-    path: '/schools?include=city,academicSystem',
+    path: '/schools?include=city,academicSystem&filter[id]=2848,1923',
     status: 'TODO',
+    description: 'need multiple academicSystem relationships',
   },
   {
     slug: 'schools-includeSingle',
-    description: 'WIP',
-    path: '/schools?include=city',
-    status: 'TODO',
+    path: '/schools?include=city&filter[id]=2848,1923',
+    status: 'Done',
   },
 ];

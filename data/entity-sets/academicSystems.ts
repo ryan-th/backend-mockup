@@ -1,4 +1,4 @@
-import { AcademicSystem } from '../interfaces/entities';
+import { AcademicSystem } from '../../interfaces/entities';
 
 export const academicSystems: AcademicSystem[] = [
   {

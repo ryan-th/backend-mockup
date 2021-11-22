@@ -11,6 +11,7 @@ export type EntitySetName =
 export type EntityName = 'academicSystem' | 'city' | 'country' | 'school';
 
 export interface Entity {
+  type: string;
   id: number;
 }
 

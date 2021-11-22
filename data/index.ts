@@ -15,6 +15,9 @@ import { defaultSchoolPropertyNames, schools } from './schools';
 import { cityCountries } from './relationships/cityCountries';
 import { schoolAcademicSystems } from './relationships/schoolAcademicSystems';
 import { schoolCities } from './relationships/schoolCities';
+
+// schemas
+import { academicSystemQueryObjectSchema } from '../queries/schemas/academicSystems';
 import { cityQueryObjectSchema } from '../queries/schemas/cities';
 import { schoolQueryObjectSchema } from '../queries/schemas/schools';
 
@@ -25,8 +28,7 @@ export const entitySets: EntitySet[] = [
     entityName: 'academicSystem',
     defaultPropertyNames: defaultAcademicSystemPropertyNames,
     data: academicSystems,
-    // TODO
-    querySchema: null,
+    querySchema: academicSystemQueryObjectSchema,
   },
   {
     name: 'cities',
@@ -59,17 +61,21 @@ export const entitySetRelationships: EntitySetRelationship[] = [
     fromEntityName: 'school',
     toEntityName: 'academicSystem',
     data: schoolAcademicSystems,
+    sqlFrom:
+      'INNER JOIN aSchoolAcademicSystems sas ON s.id = sas.schoolId INNER JOIN aAcademicSystems `as` ON sas.academicSystemId = `as`.id',
   },
   {
     name: 'schoolCities',
     fromEntityName: 'school',
     toEntityName: 'city',
     data: schoolCities,
+    sqlFrom: '',
   },
   {
     name: 'cityCountries',
     fromEntityName: 'city',
     toEntityName: 'country',
     data: cityCountries,
+    sqlFrom: '',
   },
 ];

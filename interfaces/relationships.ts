@@ -13,4 +13,5 @@ export type EntitySetRelationship = {
   fromEntityName: string;
   toEntityName: string;
   data: EntityRelationship[];
+  sqlFrom: string;
 };

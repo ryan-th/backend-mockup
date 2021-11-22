@@ -1,5 +1,5 @@
 import { AcademicSystem, City, Country, EntityName, School } from './entities';
-import { Errors } from './jsonapi-typescript';
+import { Errors } from './3rd-party/jsonapi-typescript';
 
 // generic
 export type QueryPath = string;

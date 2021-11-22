@@ -92,6 +92,9 @@ export const cityQueryObjectSchema: JSONSchema7 = {
     filter: {
       additionalProperties: false,
       properties: {
+        'country.id': {
+          $ref: '#/definitions/FilterOperator',
+        },
         id: {
           $ref: '#/definitions/FilterOperator',
         },

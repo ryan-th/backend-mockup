@@ -6,8 +6,6 @@ interface Test extends BaseTest {
   inputs: string[];
   expect: QueryObject;
   result?: QueryObject;
-  isSuccess?: boolean;
-  note?: string;
 }
 
 export function getTestResults(): BaseTest[] {
@@ -35,7 +33,7 @@ export function getTestResults(): BaseTest[] {
       inputs: ['/cities?fields[entity1]=property1,property2,property3'],
       expect: {
         type: 'city',
-        fields: { entity1: ['property1', 'property2', 'property3'] },
+        fields: { entity1: ['property1', 'property2', 'properfty3'] },
       },
     },
     // TODO: add more tests
@@ -44,8 +42,9 @@ export function getTestResults(): BaseTest[] {
   const results = tests.map((test) => {
     test.functionName = 'deriveQueryObjectFromQueryPath';
     test.result = deriveQueryObjectFromQueryPath.call(this, ...test.inputs);
-    test.isSuccess =
-      JSON.stringify(test.result) === JSON.stringify(test.expect);
+    const strResult = JSON.stringify(test.result);
+    const strExpect = JSON.stringify(test.expect);
+    test.isSuccess = strResult === strExpect;
     return test;
   });
 

@@ -175,6 +175,87 @@ export function getTestResults$(): Observable<Test[]> {
         ],
       },
     },
+    {
+      inputs: ['/academicSystems?filter[id]=2,4'],
+      expect: {
+        data: [
+          {
+            type: 'academicSystem',
+            id: '2',
+            attributes: {
+              name: 'American',
+            },
+          },
+          {
+            type: 'academicSystem',
+            id: '4',
+            attributes: {
+              name: 'Indian',
+            },
+          },
+        ],
+      },
+    },
+    {
+      inputs: ['/cities?page[size]=2&page[number]=1'],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+              slug: 'city-slug-1',
+            },
+          },
+          {
+            type: 'city',
+            id: '2',
+            attributes: {
+              name: 'Beijing',
+              slug: 'city-slug-2',
+            },
+          },
+        ],
+      },
+    },
+    {
+      inputs: ['/cities?include=country&filter[country.name]=Portugal'],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+              slug: 'city-slug-1',
+            },
+            relationships: {
+              country: {
+                data: {
+                  type: 'country',
+                  id: '5',
+                },
+              },
+            },
+          },
+        ],
+        included: [
+          {
+            type: 'country',
+            id: '5',
+            attributes: {
+              name: 'Portugal',
+              slug: 'country-slug-1',
+            },
+          },
+        ],
+      },
+    },
+    // {
+    //   inputs: ['/cities'],
+    //   expect: {},
+    // },
     // TODO: add more tests
   ];
 
@@ -184,7 +265,11 @@ export function getTestResults$(): Observable<Test[]> {
     const strResult = JSON.stringify(test.result);
     const strExpect = JSON.stringify(test.expect);
     test.isSuccess = strResult === strExpect;
-    if (!test.isSuccess) console.log(15, strResult, strExpect);
+    if (!test.isSuccess) {
+      console.log('input: ', test.inputs[0]);
+      console.log('expect: ', strExpect);
+      console.log('result: ', strResult);
+    }
 
     return test;
   };

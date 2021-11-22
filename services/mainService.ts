@@ -34,7 +34,10 @@ import {
   ResourceObject,
 } from '../interfaces/3rd-party/jsonapi-typescript';
 
-export function getResponseFromRequest$(queryPath: QueryPath): Observable<any> {
+// TODO: consider renaming to getJsonApiResponseFromQueryPath?
+export function getResponseFromRequest$(
+  queryPath: QueryPath
+): Observable<JsonApiDocument> {
   const deriveQuery$ = (queryPath: QueryPath) => {
     console.log('queryPath:', queryPath);
     const query = deriveQueryFromQueryPath(queryPath);
@@ -42,7 +45,7 @@ export function getResponseFromRequest$(queryPath: QueryPath): Observable<any> {
   };
 
   const validateQuery$ = ([query]: [Query]) => {
-    console.log('query:', query);
+    console.log('query:', query, JSON.stringify(query));
     const queryErrors = validateQuery(query);
     query.isValidObject = !queryErrors;
     query.errors = queryErrors;
@@ -102,7 +105,7 @@ export function getResponseFromRequest$(queryPath: QueryPath): Observable<any> {
     number[],
     {} | Record<EntityName, EntityRelationship[]>,
     Entity[]
-  ]) => {
+  ]): Observable<JsonApiDocument> => {
     console.log('included:', included);
     const jsonApi = deriveJsonApi(query, entitySet, relationships, included);
     return of(jsonApi);
@@ -126,6 +129,7 @@ export function getResponseFromRequest$(queryPath: QueryPath): Observable<any> {
 // }
 
 // TODO: move higher
+// TODO: rename list to 'EntitySet'
 function getList(query: Query): Observable<EntitySet> {
   // TODO: gradually improve matching to query
   const qo: QueryObject = query.object;
@@ -149,6 +153,8 @@ function getList(query: Query): Observable<EntitySet> {
 
   if (isCityQueryObject(qo)) {
     let data = entitySet.data;
+
+    console.log(777, data);
 
     // filtering; TODO: move higher
     data = data.filter((x: City) => {

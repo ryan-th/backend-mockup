@@ -1,4 +1,11 @@
-import { AcademicSystem, City, Country, EntityName, School } from './entities';
+import {
+  AcademicSystem,
+  City,
+  Country,
+  EntityName,
+  Region,
+  School,
+} from './entities';
 import { Errors } from './3rd-party/jsonapi-typescript';
 
 // TODO: consider splitting file
@@ -94,38 +101,38 @@ export interface SchoolQueryObject extends QueryObject {
 
 export interface FilterOperator {
   matches?: string;
-  gt: number;
-  lt: number;
-  gte: number;
-  lte: number;
-  in: number[] | string[] | boolean[];
+  gt?: number;
+  lt?: number;
+  gte?: number;
+  lte?: number;
+  in?: number[] | string[] | boolean[];
 }
+
+// TODO: make use of this elsewhere
+type FiltersForType<Type, prefix extends string = ''> = {
+  [Property in keyof Type as `${prefix}${string & Property}`]?: FilterOperator;
+};
+
+type SortForType<Type, prefix extends string = ''> =
+  | `-${prefix}${string & keyof Type}`
+  | `${prefix}${string & keyof Type}`;
+
+type CityKeys = (keyof City)[];
+type CountryKeys = (keyof Country)[];
+type RegionKeys = (keyof Region)[];
 
 export interface CityQueryObject extends QueryObject {
   fields?: {
-    city?: (keyof City)[];
-    country?: (keyof Country)[];
+    city?: CityKeys;
+    country?: CountryKeys;
   };
-  filter?: {
-    // TODO: look into whether this can be generic in typescript (using City keys)
-    id?: FilterOperator;
-    name?: FilterOperator;
-    slug?: FilterOperator;
-    imageUrl?: FilterOperator;
-    'country.id'?: FilterOperator;
-    'country.name'?: FilterOperator;
-    // score?: FilterOperator;
-    // hasBeenVisitedByTh?: FilterOperator;
-    // description?: FilterOperator;
-  };
+  filter?: FiltersForType<City> & FiltersForType<Country, 'country.'>;
   page?: QueryObjectPage;
-  sort?: (
-    | `-${keyof City}`
-    | keyof City
-    | `-country.${keyof Country}`
-    | `country.${keyof Country}`
-  )[];
+  sort?: (SortForType<City> | SortForType<Country, 'country.'>)[];
 }
+
+// let foo: CityQueryObject;
+// foo.sort = ['name', '-country.id'];
 
 export interface CountryQueryObject extends QueryObject {
   fields?: {
@@ -144,6 +151,15 @@ export interface CountryQueryObject extends QueryObject {
     // | `-region.${keyof Region}`
     // | `region.${keyof Region}`
   )[];
+}
+
+export interface RegionQueryObject extends QueryObject {
+  fields?: {
+    region?: RegionKeys;
+  };
+  filter?: FiltersForType<Region>;
+  page?: QueryObjectPage;
+  sort?: SortForType<Region>[];
 }
 
 export interface AcademicSystemQueryObject extends QueryObject {

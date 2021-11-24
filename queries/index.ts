@@ -5,6 +5,7 @@ import { compareFnGenerator } from '../services/dataService';
 import { getAcademicSystemQueries } from './academicSystems';
 import { getCityQueries } from './cities';
 import { getCountryQueries } from './countries';
+import { getRegionQueries } from './regions';
 import { getSchoolQueries } from './schools';
 
 // TODO: move higher
@@ -17,12 +18,13 @@ const list_moveItem = (list: any[], fromIndex: number, toIndex: number) => {
 
 function getQueries(): Query[] {
   // edit this to whichever query you're currently working on
-  const defaultQuerySlug = 'schools-includeSingle';
+  const defaultQuerySlug = 'regions-noParams';
 
   let queries: Query[] = [
     ...getAcademicSystemQueries(),
     ...getCityQueries(),
     ...getCountryQueries(),
+    ...getRegionQueries(),
     ...getSchoolQueries(),
   ];
 

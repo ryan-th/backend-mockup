@@ -6,12 +6,18 @@ export type EntitySetName =
   | 'academicSystems'
   | 'cities'
   | 'countries'
+  | 'regions'
   | 'schools';
 
-export type EntityName = 'academicSystem' | 'city' | 'country' | 'school';
+export type EntityName =
+  | 'academicSystem'
+  | 'city'
+  | 'country'
+  | 'region'
+  | 'school';
 
 export interface Entity {
-  type: string;
+  type: EntityName; // possibly temporary
   id: number;
 }
 
@@ -39,9 +45,14 @@ export interface Country extends Entity {
   slug: string;
 }
 
+export interface Region extends Entity {
+  name: string;
+  slug: string;
+}
+
 export interface School extends Entity {
   name: string;
   slug: string;
-  cityId: number;
+  // cityId: number;
   hasBeenVisitedByTh?: boolean;
 }

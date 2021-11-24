@@ -10,4 +10,9 @@ const queries: Query[] = [
     path: '/regions?filter[id]=1,4',
     status: 'TODO',
   },
+  {
+    slug: 'regions-noParam',
+    path: '/regions',
+    status: 'TODO',
+  },
 ];

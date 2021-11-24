@@ -32,7 +32,8 @@ const queries: Query[] = [
     slug: 'schools-includeMultiple',
     path: '/schools?include=city,academicSystem&filter[id]=2848,1923',
     status: 'TODO',
-    description: 'need multiple academicSystem relationships',
+    description:
+      'need multiple academicSystem relationships (academicSystem.data needs to be an array)',
   },
   {
     slug: 'schools-includeSingle',

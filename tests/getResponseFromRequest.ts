@@ -309,10 +309,113 @@ export function getTestResults$(): Observable<Test[]> {
         ],
       },
     },
+    {
+      inputs: [
+        '/schoolAcademicSystems?filter[schoolId]=1&include=academicSystems',
+      ],
+      expect: {
+        data: [
+          {
+            type: 'schoolAcademicSystem',
+            id: '7',
+            relationships: {
+              academicSystems: {
+                data: [
+                  {
+                    type: 'academicSystem',
+                    id: '2',
+                  },
+                ],
+              },
+            },
+          },
+          {
+            type: 'schoolAcademicSystem',
+            id: '8',
+            relationships: {
+              academicSystems: {
+                data: [
+                  {
+                    type: 'academicSystem',
+                    id: '4',
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        included: [
+          {
+            type: 'academicSystem',
+            id: '2',
+            attributes: {
+              name: 'American',
+            },
+          },
+          {
+            type: 'academicSystem',
+            id: '4',
+            attributes: {
+              name: 'Indian',
+            },
+          },
+        ],
+      },
+    },
+    {
+      inputs: ['/cities/1?include=country,country.region'],
+      expect: {
+        data: [
+          {
+            type: 'city',
+            id: '1',
+            attributes: {
+              name: 'Lisbon',
+              slug: 'city-slug-1',
+            },
+            relationships: {
+              country: {
+                data: {
+                  type: 'country',
+                  id: '5',
+                },
+              },
+            },
+          },
+        ],
+        included: [
+          {
+            type: 'country',
+            id: '5',
+            attributes: {
+              name: 'Portugal',
+              slug: 'country-slug-1',
+            },
+            relationships: {
+              region: {
+                data: {
+                  type: 'region',
+                  id: '3',
+                },
+              },
+            },
+          },
+          {
+            type: 'region',
+            id: '3',
+            attributes: {
+              name: 'Europe',
+              slug: 'europe',
+            },
+          },
+        ],
+      },
+    },
     // {
     //   inputs: ['/cities'],
     //   expect: {},
     // },
+
     // TODO: add more tests
   ];
 

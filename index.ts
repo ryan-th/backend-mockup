@@ -1,7 +1,7 @@
 import { fromEvent, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
-import { queries } from './queries/index';
+import { getQueryStatusColor, queries } from './queries/index';
 import { runTests } from './tests';
 import { getResponseFromRequest$ } from './services/mainService';
 
@@ -12,7 +12,7 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  runTests();
+  // runTests();
 
   setHtml();
   setObservables();
@@ -35,6 +35,7 @@ function setHtml() {
   queries.forEach((query, i) => {
     var option = document.createElement('option');
     option.innerText = query.slug;
+    option.style.color = getQueryStatusColor(query.status);
     select.appendChild(option);
   });
 
@@ -51,6 +52,7 @@ function setHtml() {
       }`;
     }
     input.value = query.path;
+    pre.innerText = '';
   }
 
   function clearResponseAndConsole() {

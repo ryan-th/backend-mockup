@@ -12,11 +12,12 @@ import { Errors } from './3rd-party/jsonapi-typescript';
 
 // generic
 export type QueryPath = string;
+export type QueryStatus = 'TODO' | 'WIP' | 'Done';
 
 // TODO: consider refactoring
 export interface Query {
   slug: string;
-  status: 'TODO' | 'WIP' | 'Done';
+  status: QueryStatus;
   path: QueryPath;
   description?: string;
   object?: QueryObject;

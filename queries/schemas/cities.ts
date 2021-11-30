@@ -6,6 +6,7 @@ import { JSONSchema7 } from 'json-schema';
 // TODO: add schemas from different perspectives (e.g. admin, school, teacher, etc.)
 export const cityQueryObjectSchema: JSONSchema7 = {
   $schema: 'http://json-schema.org/draft-07/schema#',
+  $id: 'cityQueryObjectSchema',
   additionalProperties: false,
   definitions: {
     EntityName: {
@@ -96,6 +97,12 @@ export const cityQueryObjectSchema: JSONSchema7 = {
           $ref: '#/definitions/FilterOperator',
         },
         'country.name': {
+          $ref: '#/definitions/FilterOperator',
+        },
+        'country.slug': {
+          $ref: '#/definitions/FilterOperator',
+        },
+        'country.region.id': {
           $ref: '#/definitions/FilterOperator',
         },
         id: {

@@ -1,11 +1,17 @@
 import { City } from '../../interfaces/entities';
 
-export const cities: City[] = [
+export let cities: City[] = [
   {
     id: 1,
     name: 'Lisbon',
     slug: 'city-slug-1',
     imageUrl: 'city-imageUrl-1',
+  },
+  {
+    id: 4,
+    name: 'Porto',
+    slug: 'city-slug-4',
+    imageUrl: 'city-imageUrl-4',
   },
   {
     id: 2,

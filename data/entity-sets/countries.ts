@@ -21,4 +21,10 @@ export const countries: Country[] = [
   },
 ];
 
+export const allCountryPropertyNames: (keyof Country)[] = [
+  'id',
+  'type',
+  'name',
+  'slug',
+];
 export const defaultCountryPropertyNames: (keyof Country)[] = ['name', 'slug'];

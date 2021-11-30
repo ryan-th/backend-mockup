@@ -17,13 +17,14 @@ export type EntityName =
   | 'school';
 
 export interface Entity {
-  type: EntityName; // possibly temporary
+  type?: EntityName; // possibly temporary
   id: number;
 }
 
 export interface EntitySet {
   name: EntitySetName;
   entityName: EntityName;
+  allPropertyNames: string[];
   defaultPropertyNames: string[];
   data: Entity[];
   querySchema: JSONSchema7;

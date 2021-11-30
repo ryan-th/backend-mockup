@@ -26,6 +26,7 @@ export function getTestResults(): BaseTest[] {
     },
     {
       inputs: [prepare('/cities?sort=foo')],
+      // TODO RR/JP: define required error response
       expect: {
         slug: 'invalid-resource',
       },

@@ -1,5 +1,9 @@
 import Ajv from 'ajv';
-import { ErrorObject as AjvErrorObject, ValidateFunction } from 'ajv/dist/core';
+import {
+  AnyValidateFunction,
+  ErrorObject as AjvErrorObject,
+  ValidateFunction,
+} from 'ajv/dist/core';
 
 // interfaces
 import {
@@ -10,6 +14,7 @@ import {
   Query,
   QueryObject,
   QueryObjectKey,
+  RegionQueryObject,
   SchoolQueryObject,
 } from '../interfaces/queries';
 import { JsonApiErrorObject } from '../interfaces/responses';
@@ -22,15 +27,13 @@ import { mergeObjects } from './genericServices';
 
 // TODO
 import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
+import { EntitySet } from '../interfaces/entities';
 
-// // TODO: move higher
-// interface Validators {
-//   isValidCityQueryObject: ValidateFunction<unknown>;
-//   isValidSchoolQueryObject: ValidateFunction<unknown>;
-// }
+let ajv: Ajv;
 
-export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
-  x.type === 'school';
+export const isAcademicSystemQueryObject = (
+  x: QueryObject
+): x is AcademicSystemQueryObject => x.type === 'academicSystem';
 
 export const isCityQueryObject = (x: QueryObject): x is CityQueryObject =>
   x.type === 'city';
@@ -38,9 +41,11 @@ export const isCityQueryObject = (x: QueryObject): x is CityQueryObject =>
 export const isCountryQueryObject = (x: QueryObject): x is CountryQueryObject =>
   x.type === 'country';
 
-export const isAcademicSystemQueryObject = (
-  x: QueryObject
-): x is AcademicSystemQueryObject => x.type === 'academicSystem';
+export const isRegionQueryObject = (x: QueryObject): x is RegionQueryObject =>
+  x.type === 'region';
+
+export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
+  x.type === 'school';
 
 export function deriveQueryFromQueryPath(queryPath: string): Query {
   const queryObject = deriveQueryObjectFromQueryPath(queryPath);
@@ -48,7 +53,7 @@ export function deriveQueryFromQueryPath(queryPath: string): Query {
   // TODO: refactor
   return {
     slug: 'custom',
-    description: 'custom query',
+    status: 'WIP',
     path: queryPath,
     object: queryObject,
   };
@@ -164,7 +169,19 @@ function deriveJsonApiErrorObjectFromAjvErrorObject(
   };
 }
 
+function getCompiledQuerySchema(entitySet: EntitySet): AnyValidateFunction {
+  if (!ajv) ajv = new Ajv();
+  // https://ajv.js.org/guide/managing-schemas.html
+  return (
+    ajv.getSchema(entitySet.name + 'QueryObjectSchema') ||
+    ajv.compile(
+      entitySet.querySchema || { $id: entitySet.name + 'QueryObjectSchema' }
+    )
+  );
+}
+
 // TODO: add more cases; define behaviour; add more QueryError values
+// TODO: consider passing in only query.object
 export function validateQuery(query: Query): JsonApiErrorObject[] {
   const qo: QueryObject = query.object;
 
@@ -175,12 +192,13 @@ export function validateQuery(query: Query): JsonApiErrorObject[] {
   // TODO: refactor (create a standard function or pass as param)
   const entitySet = entitySets.find((x) => x.entityName === qo.type);
 
-  const ajv = new Ajv();
-  const validateQueryObject = ajv.compile(entitySet.querySchema || {});
+  const ajvValidator: AnyValidateFunction = getCompiledQuerySchema(entitySet);
+  const validateQueryObject = ajvValidator;
   const isValid = validateQueryObject(qo);
   if (isValid) return null;
 
   const ajvErrorObjects = validateQueryObject.errors;
+
   const jsonApiErrorObjects = ajvErrorObjects.map((ajvErrorObject) =>
     deriveJsonApiErrorObjectFromAjvErrorObject(ajvErrorObject)
   );

@@ -6,6 +6,10 @@ export const cityCountries: EntityRelationship[] = [
     toId: 5,
   },
   {
+    fromId: 4,
+    toId: 5,
+  },
+  {
     fromId: 2,
     toId: 6,
   },

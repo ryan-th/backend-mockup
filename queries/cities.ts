@@ -22,6 +22,24 @@ const queries: Query[] = [
     status: 'Done',
   },
   {
+    slug: 'cities-filterByCountryId',
+    path: '/cities?filter[country.id]=5',
+    status: 'Done',
+    description: 'cities in Portugal (using id)',
+  },
+  {
+    slug: 'cities-filterByCountryName',
+    path: '/cities?filter[country.name]=Portugal',
+    status: 'Done',
+    description: 'cities in Portugal (using name)',
+  },
+  {
+    slug: 'cities-filterByCountrySlug',
+    path: '/cities?filter[country.slug]=country-slug-1',
+    status: 'Done',
+    description: 'cities in Portugal (using slug)',
+  },
+  {
     slug: 'cities-getById',
     path: '/cities/2',
     status: 'Done',
@@ -32,9 +50,10 @@ const queries: Query[] = [
     status: 'Done',
   },
   {
-    slug: 'cities-inPortugal',
-    path: '/cities?include=country&filter[country.name]=Portugal',
-    status: 'WIP',
+    slug: 'cities-includeCountryAndRegion',
+    path: '/cities/1?include=country,country.region',
+    status: 'TODO',
+    description: 'for AN',
   },
   {
     slug: 'cities-nameMatch',

@@ -21,7 +21,10 @@ export function isMatch_numberEq(value: number, matchValue: number): boolean {
   return value === matchValue;
 }
 
-export function isMatch_listIncludes(value: any, matchValue: any[]): boolean {
+export function isMatch_entitySetIncludes(
+  value: any,
+  matchValue: any[]
+): boolean {
   if (value === undefined || value === []) return true;
   if (matchValue === undefined) return true;
   return matchValue.includes(value);

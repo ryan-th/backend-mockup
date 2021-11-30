@@ -20,7 +20,8 @@ export function getEntitySetRelationship(
   console.log(fromEntityName, toEntityName);
   return entitySetRelationships.find(
     (x) =>
-      x.fromEntityName === fromEntityName && x.toEntityName === toEntityName
+      x.fromEntitySet.entityName === fromEntityName &&
+      x.toEntitySet.entityName === toEntityName
   );
 }
 

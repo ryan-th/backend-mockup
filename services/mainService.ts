@@ -4,7 +4,12 @@ import { switchMap } from 'rxjs/operators';
 
 // interfaces
 import { City, Entity, EntityName, EntitySet } from '../interfaces/entities';
-import { Query, QueryObject, QueryPath } from '../interfaces/queries';
+import {
+  Query,
+  QueryObject,
+  QueryObjectPage,
+  QueryPath,
+} from '../interfaces/queries';
 import {
   EntityRelationship,
   EntitySetRelationshipName,
@@ -19,20 +24,25 @@ import {
   entitiesPluck,
   getEntitySetRelationship,
 } from './dataService';
-import { isMatch_listIncludes, isMatch_stringMatches } from './filterService';
+import {
+  isMatch_entitySetIncludes,
+  isMatch_stringMatches,
+} from './filterService';
 import {
   deriveQueryFromQueryPath,
   isAcademicSystemQueryObject,
   isCityQueryObject,
   isCountryQueryObject,
+  isRegionQueryObject,
   isSchoolQueryObject,
   validateQuery,
 } from './queryService';
-import { JsonApiDocument } from '../interfaces/responses';
+import { JsonApiDocument, JsonApiErrorObject } from '../interfaces/responses';
 import {
   PrimaryData,
   ResourceObject,
 } from '../interfaces/3rd-party/jsonapi-typescript';
+import { allCountryPropertyNames } from '../data/entity-sets/countries';
 
 // TODO: consider renaming to getJsonApiResponseFromQueryPath?
 export function getResponseFromRequest$(
@@ -52,42 +62,48 @@ export function getResponseFromRequest$(
     return combineLatest([of(query), of(queryErrors)]);
   };
 
-  // TODO: rename 'list' to 'entitySet'
-  // TODO: remove need for 'any'
-  const getList$ = ([query, queryErrors]: [Query, any[]]) => {
+  const getEntitySet$ = ([query, queryErrors]: [
+    Query,
+    JsonApiErrorObject[]
+  ]) => {
     console.log('queryErrors:', queryErrors);
-    const list$ = getList(query);
-    return combineLatest([of(query), list$]);
+    const entitySet$ = getEntitySet(query);
+    return combineLatest([of(query), entitySet$]);
   };
 
-  const deriveListIds$ = ([query, list]: [Query, EntitySet]) => {
-    console.log('list:', list);
-    const listIds = deriveListIds(list);
-    return combineLatest([of(query), of(list), of(listIds)]);
+  const deriveEntitySetIds$ = ([query, entitySet]: [Query, EntitySet]) => {
+    console.log('entitySet:', entitySet);
+    const entitySetIds = deriveEntitySetIds(entitySet);
+    return combineLatest([of(query), of(entitySet), of(entitySetIds)]);
   };
 
-  const getListRelationships$ = ([query, list, listIds]: [
+  const getEntitySetRelationships$ = ([query, entitySet, entitySetIds]: [
     Query,
     EntitySet,
     number[]
   ]) => {
-    console.log('listIds:', listIds);
-    const relationships$ = getListRelationships(query, listIds);
-    return combineLatest([of(query), of(list), of(listIds), relationships$]);
+    console.log('entitySetIds:', entitySetIds);
+    const relationships$ = getEntitySetRelationships(query, entitySetIds);
+    return combineLatest([
+      of(query),
+      of(entitySet),
+      of(entitySetIds),
+      relationships$,
+    ]);
   };
 
-  const getIncluded$ = ([query, list, listIds, relationships]: [
+  const getIncluded$ = ([query, entitySet, entitySetIds, relationships]: [
     Query,
     EntitySet,
     number[],
     {} | Record<EntityName, EntityRelationship[]>
   ]) => {
     console.log('relationships:', relationships);
-    const included$ = getIncluded(query, listIds, relationships);
+    const included$ = getIncluded(query, entitySetIds, relationships);
     return combineLatest([
       of(query),
-      of(list),
-      of(listIds),
+      of(entitySet),
+      of(entitySetIds),
       of(relationships),
       included$,
     ]);
@@ -96,7 +112,7 @@ export function getResponseFromRequest$(
   const deriveJsonApi$ = ([
     query,
     entitySet,
-    listIds,
+    entitySetIds,
     relationships,
     included,
   ]: [
@@ -115,9 +131,9 @@ export function getResponseFromRequest$(
   return of(queryPath).pipe(
     switchMap(deriveQuery$),
     switchMap(validateQuery$),
-    switchMap(getList$),
-    switchMap(deriveListIds$),
-    switchMap(getListRelationships$),
+    switchMap(getEntitySet$),
+    switchMap(deriveEntitySetIds$),
+    switchMap(getEntitySetRelationships$),
     switchMap(getIncluded$),
     switchMap(deriveJsonApi$)
   );
@@ -128,9 +144,28 @@ export function getResponseFromRequest$(
 //   if (entityName === 'city') return queries[1];
 // }
 
+function sortData(data: Entity[], sort: string[]): Entity[] {
+  if (sort?.length > 0) {
+    const adaptedSort = sort.map((x) =>
+      x.startsWith('-') ? { key: x.slice(1), reverse: true } : x
+    );
+    return data.sort(compareFnGenerator<any>(adaptedSort));
+  }
+  return data;
+}
+
+function pageData(data: Entity[], page: QueryObjectPage): Entity[] {
+  const pageSize = page?.size;
+  if (pageSize) {
+    const pageNumber = page?.number || 1;
+    const from = (pageNumber - 1) * pageSize;
+    return data.slice(from, from + pageSize);
+  }
+  return data;
+}
+
 // TODO: move higher
-// TODO: rename list to 'EntitySet'
-function getList(query: Query): Observable<EntitySet> {
+function getEntitySet(query: Query): Observable<EntitySet> {
   // TODO: gradually improve matching to query
   const qo: QueryObject = query.object;
   let entitySet: EntitySet;
@@ -143,7 +178,7 @@ function getList(query: Query): Observable<EntitySet> {
     let data = entitySet.data;
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_entitySetIncludes(x.id, qo.filter.id?.in)) return false;
       if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
@@ -154,31 +189,27 @@ function getList(query: Query): Observable<EntitySet> {
   if (isCityQueryObject(qo)) {
     let data = entitySet.data;
 
-    console.log(777, data);
+    // console.log(777, data);
 
     // filtering; TODO: move higher
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_entitySetIncludes(x.id, qo.filter.id?.in)) return false;
+
+      // TODO: make more generic; move to function
+      const esi = isMatch_entitySetIncludes;
+      const isMatch = allCountryPropertyNames.every((p) =>
+        esi(x[`country.${p}`], qo.filter[`country.${p}`]?.in)
+      );
+      if (!isMatch) return false;
+
       if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
+
       return true;
     });
 
-    // sorting; TODO: move higher
-    if (qo.sort?.length > 0) {
-      const adaptedSort = qo.sort.map((x) =>
-        x.startsWith('-') ? { key: x.slice(1), reverse: true } : x
-      );
-      data = data.sort(compareFnGenerator<any>(adaptedSort));
-    }
-
-    // paging; TODO: move higher
-    const pageSize = qo.page?.size;
-    if (pageSize) {
-      const pageNumber = qo.page?.number || 1;
-      const from = (pageNumber - 1) * pageSize;
-      data = data.slice(from, from + pageSize);
-    }
+    data = sortData(data, qo.sort);
+    data = pageData(data, qo.page);
 
     entitySet.data = data;
   }
@@ -190,10 +221,31 @@ function getList(query: Query): Observable<EntitySet> {
     let data = entitySet.data;
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_entitySetIncludes(x.id, qo.filter.id?.in)) return false;
       if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
+
+    data = sortData(data, qo.sort);
+    data = pageData(data, qo.page);
+
+    entitySet.data = data;
+  }
+
+  if (isRegionQueryObject(qo)) {
+    // entitySet.data = entitySet.data.filter((x) =>
+    //   qo.filter?.id?.includes(x['id'])
+    // );
+    let data = entitySet.data;
+    data = data.filter((x: City) => {
+      if (!qo.filter) return true;
+      if (!isMatch_entitySetIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
+      return true;
+    });
+
+    data = sortData(data, qo.sort);
+    data = pageData(data, qo.page);
 
     entitySet.data = data;
   }
@@ -208,7 +260,7 @@ function getList(query: Query): Observable<EntitySet> {
     let data = entitySet.data;
     data = data.filter((x: City) => {
       if (!qo.filter) return true;
-      if (!isMatch_listIncludes(x.id, qo.filter.id?.in)) return false;
+      if (!isMatch_entitySetIncludes(x.id, qo.filter.id?.in)) return false;
       if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
       return true;
     });
@@ -227,15 +279,15 @@ function getList(query: Query): Observable<EntitySet> {
 }
 
 // TODO: move higher
-function deriveListIds(entitySet: EntitySet): number[] {
+function deriveEntitySetIds(entitySet: EntitySet): number[] {
   if (entitySet == null) return [];
   return entitySet.data.map((x) => x.id);
 }
 
 // TODO: move higher
-function getListRelationships(
+function getEntitySetRelationships(
   query: Query,
-  listIds: number[]
+  entitySetIds: number[]
 ): Observable<Record<EntityName, EntityRelationship[]> | {}> {
   // TODO: consider this returning all 'relationships' AND 'included'
   if (!query.isValidObject) return of({});
@@ -247,16 +299,16 @@ function getListRelationships(
     // console.log(111, toEntityName);
     if (toEntityName.includes('.')) return;
 
-    const listRelationship = getEntitySetRelationship(
+    const entitySetRelationship = getEntitySetRelationship(
       fromEntityName,
       toEntityName
     );
-    // console.log(99, listRelationship);
+    // console.log(99, entitySetRelationship);
     // const subQuery = deriveSubQuery(query, entityName);
-    const filteredRelationship = listRelationship.data.filter((x) =>
-      listIds.includes(x.fromId)
+    const filteredRelationship = entitySetRelationship.data.filter((x) =>
+      entitySetIds.includes(x.fromId)
     );
-    relationships[listRelationship.name] = of(filteredRelationship);
+    relationships[entitySetRelationship.name] = of(filteredRelationship);
   });
 
   return Object.keys(relationships).length === 0
@@ -267,7 +319,7 @@ function getListRelationships(
 // TODO: move higher
 function getIncluded(
   query: Query,
-  listIds: number[],
+  entitySetIds: number[],
   relationships: Record<EntitySetRelationshipName, EntityRelationship[]> | {}
 ): Observable<Entity[]> {
   let set = [];
@@ -283,7 +335,7 @@ function getIncluded(
       (x) => x.name === entitySetRelationshipName
     );
     const entitySet = entitySets.find(
-      (x) => x.entityName === entitySetRelationship.toEntityName
+      (x) => x.entityName === entitySetRelationship.toEntitySet.entityName
     );
     const toIds = [
       ...new Set(
@@ -294,14 +346,14 @@ function getIncluded(
 
     // pluck requested fields
     const fieldNames: string[] =
-      qo.fields?.[entitySetRelationship.toEntityName] ||
+      qo.fields?.[entitySetRelationship.toEntitySet.entityName] ||
       entitySet.defaultPropertyNames;
     // console.log(333, entitySet, entitySetRelationship.toEntityName, fieldNames);
     subset = entitiesPluck(subset, fieldNames);
     subset.forEach((x) => (x['type'] = entitySet.entityName));
 
     const children = qo.include.filter((x) =>
-      x.startsWith(entitySetRelationship.toEntityName + '.')
+      x.startsWith(entitySetRelationship.toEntitySet.entityName + '.')
     );
 
     // console.log(77, children, query);
@@ -349,9 +401,9 @@ function deriveJsonApi(
         (rel: EntityRelationship) => id === rel.fromId
       );
       if (entityRelationship) {
-        item.relationships[entitySetRelationship.toEntityName] = {
+        item.relationships[entitySetRelationship.toEntitySet.entityName] = {
           data: {
-            type: entitySetRelationship.toEntityName,
+            type: entitySetRelationship.toEntitySet.entityName,
             id: entityRelationship.toId.toString(),
           },
         };

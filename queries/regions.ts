@@ -7,12 +7,12 @@ export function getRegionQueries(): Query[] {
 const queries: Query[] = [
   {
     slug: 'regions-filterById',
-    path: '/regions?filter[id]=1,4',
-    status: 'TODO',
+    path: '/regions?filter[id]=1,3',
+    status: 'Done',
   },
   {
-    slug: 'regions-noParam',
+    slug: 'regions-noParams',
     path: '/regions',
-    status: 'TODO',
+    status: 'Done',
   },
 ];

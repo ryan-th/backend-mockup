@@ -11,6 +11,12 @@ interface Test extends BaseTest {
 export function getTestResults(): BaseTest[] {
   const tests: Test[] = [
     {
+      inputs: ['/regions'],
+      expect: {
+        type: 'region',
+      },
+    },
+    {
       inputs: ['/cities'],
       expect: {
         type: 'city',
@@ -33,7 +39,7 @@ export function getTestResults(): BaseTest[] {
       inputs: ['/cities?fields[entity1]=property1,property2,property3'],
       expect: {
         type: 'city',
-        fields: { entity1: ['property1', 'property2', 'properfty3'] },
+        fields: { entity1: ['property1', 'property2', 'property3'] },
       },
     },
     // TODO: add more tests

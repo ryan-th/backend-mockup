@@ -1,4 +1,4 @@
-import { School } from '../../interfaces/entities';
+import { School } from '../../../../interfaces/entities';
 
 export const schools: School[] = [
   {

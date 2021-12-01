@@ -20,7 +20,7 @@ import {
 import { JsonApiErrorObject } from '../interfaces/responses';
 
 // data
-import { entitySets } from '../data';
+// import { entitySets } from '../data';
 
 // services
 import { mergeObjects } from './genericServices';
@@ -28,6 +28,7 @@ import { mergeObjects } from './genericServices';
 // TODO
 import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
 import { EntitySet } from '../interfaces/entities';
+import { ModuleData } from '../modules/school';
 
 let ajv: Ajv;
 
@@ -47,8 +48,11 @@ export const isRegionQueryObject = (x: QueryObject): x is RegionQueryObject =>
 export const isSchoolQueryObject = (x: QueryObject): x is SchoolQueryObject =>
   x.type === 'school';
 
-export function deriveQueryFromQueryPath(queryPath: string): Query {
-  const queryObject = deriveQueryObjectFromQueryPath(queryPath);
+export function deriveQueryFromQueryPath(
+  entitySets: EntitySet[],
+  queryPath: string
+): Query {
+  const queryObject = deriveQueryObjectFromQueryPath(entitySets, queryPath);
 
   // TODO: refactor
   return {
@@ -59,7 +63,10 @@ export function deriveQueryFromQueryPath(queryPath: string): Query {
   };
 }
 
-export function deriveQueryObjectFromQueryPath(queryPath: string): QueryObject {
+export function deriveQueryObjectFromQueryPath(
+  entitySets: EntitySet[],
+  queryPath: string
+): QueryObject {
   // /cities/1 => { type: 'city', filter: { id: { in: [1] } } }
   // see tests for more examples
   if (queryPath == null) return;
@@ -182,7 +189,10 @@ function getCompiledQuerySchema(entitySet: EntitySet): AnyValidateFunction {
 
 // TODO: add more cases; define behaviour; add more QueryError values
 // TODO: consider passing in only query.object
-export function validateQuery(query: Query): JsonApiErrorObject[] {
+export function validateQuery(
+  moduleData: ModuleData,
+  query: Query
+): JsonApiErrorObject[] {
   const qo: QueryObject = query.object;
 
   if (qo == null) return [{ id: 'query-object-null' }];
@@ -190,7 +200,7 @@ export function validateQuery(query: Query): JsonApiErrorObject[] {
     return [{ id: 'query-object-type-not-recognised' }];
 
   // TODO: refactor (create a standard function or pass as param)
-  const entitySet = entitySets.find((x) => x.entityName === qo.type);
+  const entitySet = moduleData.entitySets.find((x) => x.entityName === qo.type);
 
   const ajvValidator: AnyValidateFunction = getCompiledQuerySchema(entitySet);
   const validateQueryObject = ajvValidator;

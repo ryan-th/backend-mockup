@@ -1,9 +1,11 @@
 import { fromEvent, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 import { getQueryStatusColor, queries } from './queries/index';
 import { runTests } from './tests';
 import { getResponseFromRequest$ } from './services/mainService';
+import { ModuleData, schoolModuleData } from './modules/school';
+import { entitySets } from './data';
 
 let input: HTMLInputElement;
 let pre: HTMLPreElement;
@@ -12,7 +14,7 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  runTests();
+  // runTests();
 
   setHtml();
   setObservables();
@@ -83,7 +85,14 @@ function setObservables() {
   const request$ = requestButtonClick$.pipe(map(() => input.value));
 
   response$ = request$.pipe(
-    switchMap((queryPath) => getResponseFromRequest$(queryPath))
+    switchMap((queryPath) => {
+      let moduleData: ModuleData;
+
+      if (queryPath.startsWith('/schools')) {
+        moduleData = schoolModuleData;
+      }
+      return getResponseFromRequest$(moduleData, queryPath);
+    })
   );
 }
 

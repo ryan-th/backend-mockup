@@ -1,4 +1,5 @@
 import { BaseTest } from '.';
+import { entitySets } from '../data';
 import { Query, QueryError } from '../interfaces/queries';
 import {
   deriveQueryFromQueryPath,
@@ -17,15 +18,15 @@ export function getTestResults(): BaseTest[] {
   const prepare = deriveQueryFromQueryPath;
   const tests: Test[] = [
     {
-      inputs: [prepare('/cities')],
+      inputs: [prepare(entitySets, '/cities')],
       expect: null,
     },
     {
-      inputs: [prepare('/cities?sort=name')],
+      inputs: [prepare(entitySets, '/cities?sort=name')],
       expect: null,
     },
     {
-      inputs: [prepare('/cities?sort=foo')],
+      inputs: [prepare(entitySets, '/cities?sort=foo')],
       // TODO RR/JP: define required error response
       expect: {
         slug: 'invalid-resource',

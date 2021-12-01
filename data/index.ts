@@ -13,7 +13,7 @@ import {
   countries,
   defaultCountryPropertyNames,
 } from './entity-sets/countries';
-import { defaultSchoolPropertyNames, schools } from './entity-sets/schools';
+// import { defaultSchoolPropertyNames, schools } from './entity-sets/schools';
 
 // relationships
 import { cityCountries } from './relationships/cityCountries';
@@ -62,14 +62,14 @@ export const entitySets: EntitySet[] = [
     // TODO
     querySchema: null,
   },
-  {
-    name: 'schools',
-    entityName: 'school',
-    allPropertyNames: ['TODO'],
-    defaultPropertyNames: defaultSchoolPropertyNames,
-    data: schools,
-    querySchema: schoolQueryObjectSchema,
-  },
+  // {
+  //   name: 'schools',
+  //   entityName: 'school',
+  //   allPropertyNames: ['TODO'],
+  //   defaultPropertyNames: defaultSchoolPropertyNames,
+  //   data: schools,
+  //   querySchema: schoolQueryObjectSchema,
+  // },
 ];
 
 function getEntitySet(entitySetName: EntitySetName): EntitySet {
@@ -107,7 +107,8 @@ console.log(12, cities, cityCountries, countries);
 // add properties to city to help with filtering
 
 function addRelatedPropertiesToEntity(rel: EntitySetRelationship) {
-  rel.fromEntitySet.data.forEach((item) => {
+  console.log(13);
+  rel.fromEntitySet?.data.forEach((item) => {
     const toId = rel.data.find((x) => x.fromId == item.id)?.toId;
     const toEntity = rel.toEntitySet.data.find((co) => co.id == toId);
     if (!toEntity) return;
@@ -116,6 +117,7 @@ function addRelatedPropertiesToEntity(rel: EntitySetRelationship) {
         toEntity[propertyName];
     });
   });
+  console.log(14);
 }
 
 // const rel = entitySetRelationships.find((x) => x.name === 'cityCountries');
@@ -123,4 +125,4 @@ function addRelatedPropertiesToEntity(rel: EntitySetRelationship) {
 entitySetRelationships.forEach(addRelatedPropertiesToEntity);
 // addRelatedPropertiesToEntity(rel);
 
-console.log(13, cities);
+console.log(15, cities);

@@ -18,8 +18,8 @@ import { schoolAcademicSystems } from './relationships/schoolAcademicSystems';
 import { schoolCities } from './relationships/schoolCities';
 
 // schemas
-import { schoolQueryObjectSchema } from '../../../queries/schemas/schools';
-import { academicSystemQueryObjectSchema } from '../../../queries/schemas/academicSystems';
+import { schoolQueryObjectSchema } from '../queries/schemas/schools';
+import { academicSystemQueryObjectSchema } from '../queries/schemas/academicSystems';
 
 // entitySets
 export const entitySets: EntitySet[] = [

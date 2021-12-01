@@ -19,8 +19,7 @@ import {
 import { cityCountries } from './relationships/cityCountries';
 
 // schemas
-import { academicSystemQueryObjectSchema } from '../../../queries/schemas/academicSystems';
-import { cityQueryObjectSchema } from '../../../queries/schemas/cities';
+import { cityQueryObjectSchema } from '../queries/schemas/cities';
 import { regions } from './entity-sets/regions';
 
 // entitySets

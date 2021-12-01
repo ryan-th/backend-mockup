@@ -15,7 +15,7 @@ interface Test extends BaseTest {
 export function getTestResults$(): Observable<Test[]> {
   const tests: Test[] = [
     {
-      inputs: ['/cities'],
+      inputs: ['/cities?filter[id]=1,2,23'],
       expect: {
         data: [
           {
@@ -46,7 +46,7 @@ export function getTestResults$(): Observable<Test[]> {
       },
     },
     {
-      inputs: ['/cities?fields[city]=imageUrl'],
+      inputs: ['/cities?filter[id]=1,2,23&fields[city]=imageUrl'],
       expect: {
         data: [
           {
@@ -197,7 +197,7 @@ export function getTestResults$(): Observable<Test[]> {
       },
     },
     {
-      inputs: ['/cities?page[size]=2&page[number]=1'],
+      inputs: ['/cities?filter[id]=1,2,23&page[size]=2&page[number]=1'],
       expect: {
         data: [
           {
@@ -229,6 +229,22 @@ export function getTestResults$(): Observable<Test[]> {
             attributes: {
               name: 'Lisbon',
               slug: 'city-slug-1',
+            },
+            relationships: {
+              country: {
+                data: {
+                  type: 'country',
+                  id: '5',
+                },
+              },
+            },
+          },
+          {
+            type: 'city',
+            id: '4',
+            attributes: {
+              name: 'Porto',
+              slug: 'city-slug-4',
             },
             relationships: {
               country: {

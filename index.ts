@@ -12,7 +12,7 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  // runTests();
+  runTests();
 
   setHtml();
   setObservables();

@@ -1,4 +1,4 @@
-import { City } from '../../interfaces/entities';
+import { City } from '../../../../interfaces/entities';
 
 export let cities: City[] = [
   {

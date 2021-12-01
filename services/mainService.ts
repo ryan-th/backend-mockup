@@ -16,7 +16,7 @@ import {
 } from '../interfaces/relationships';
 
 // data
-import { entitySetRelationships } from '../data';
+// import { entitySetRelationships } from '../data';
 
 // services
 import {
@@ -42,8 +42,10 @@ import {
   PrimaryData,
   ResourceObject,
 } from '../interfaces/3rd-party/jsonapi-typescript';
-import { allCountryPropertyNames } from '../data/entity-sets/countries';
-import { ModuleData } from '../modules/school';
+import { ModuleData } from '../interfaces/main';
+import { allCountryPropertyNames } from '../modules/regional/data/entity-sets/countries';
+// import { allCountryPropertyNames } from '../data/entity-sets/countries';
+// import { ModuleData } from '../modules/school';
 
 // TODO: consider renaming to getJsonApiResponseFromQueryPath?
 export function getResponseFromRequest$(
@@ -154,7 +156,13 @@ export function getResponseFromRequest$(
     Entity[]
   ]): Observable<JsonApiDocument> => {
     console.log('included:', included);
-    const jsonApi = deriveJsonApi(query, entitySet, relationships, included);
+    const jsonApi = deriveJsonApi(
+      moduleData,
+      query,
+      entitySet,
+      relationships,
+      included
+    );
     return of(jsonApi);
   };
 
@@ -366,7 +374,7 @@ function getIncluded(
   // console.log(555, qo, relationships, Object.keys(relationships));
 
   Object.keys(entityRelationships).forEach((entitySetRelationshipName) => {
-    const entitySetRelationship = entitySetRelationships.find(
+    const entitySetRelationship = moduleData.entitySetRelationships.find(
       (x) => x.name === entitySetRelationshipName
     );
     const entitySet = moduleData.entitySets.find(
@@ -407,6 +415,7 @@ function getIncluded(
 // TODO: move higher
 // TODO: construct correct jsonApi
 function deriveJsonApi(
+  moduleData: ModuleData,
   query: Query,
   entitySet: EntitySet,
   relationships: {} | Record<EntityName, EntityRelationship[]>,
@@ -428,7 +437,7 @@ function deriveJsonApi(
     Object.keys(relationships).forEach((key) => {
       if (!item.relationships) item.relationships = {};
 
-      const entitySetRelationship = entitySetRelationships.find(
+      const entitySetRelationship = moduleData.entitySetRelationships.find(
         (x) => x.name === key
       );
 

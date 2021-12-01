@@ -1,11 +1,12 @@
 import { fromEvent, Observable } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 import { getQueryStatusColor, queries } from './queries/index';
 import { runTests } from './tests';
 import { getResponseFromRequest$ } from './services/mainService';
-import { ModuleData, schoolModuleData } from './modules/school';
-import { entitySets } from './data';
+import { schoolModuleData } from './modules/school';
+import { ModuleData } from './interfaces/main';
+import { regionalModuleData } from './modules/regional';
 
 let input: HTMLInputElement;
 let pre: HTMLPreElement;
@@ -90,6 +91,12 @@ function setObservables() {
 
       if (queryPath.startsWith('/schools')) {
         moduleData = schoolModuleData;
+      }
+      if (queryPath.startsWith('/academicSystems')) {
+        moduleData = schoolModuleData;
+      }
+      if (queryPath.startsWith('/cities')) {
+        moduleData = regionalModuleData;
       }
       return getResponseFromRequest$(moduleData, queryPath);
     })

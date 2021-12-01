@@ -6,6 +6,8 @@ import {
 } from 'ajv/dist/core';
 
 // interfaces
+import { EntitySet } from '../interfaces/entities';
+import { ModuleData } from '../interfaces/main';
 import {
   AcademicSystemQueryObject,
   CityQueryObject,
@@ -19,16 +21,11 @@ import {
 } from '../interfaces/queries';
 import { JsonApiErrorObject } from '../interfaces/responses';
 
-// data
-// import { entitySets } from '../data';
-
 // services
 import { mergeObjects } from './genericServices';
 
 // TODO
 import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
-import { EntitySet } from '../interfaces/entities';
-import { ModuleData } from '../modules/school';
 
 let ajv: Ajv;
 
@@ -190,7 +187,7 @@ function getCompiledQuerySchema(entitySet: EntitySet): AnyValidateFunction {
 // TODO: add more cases; define behaviour; add more QueryError values
 // TODO: consider passing in only query.object
 export function validateQuery(
-  moduleData: ModuleData,
+  entitySets: EntitySet[],
   query: Query
 ): JsonApiErrorObject[] {
   const qo: QueryObject = query.object;
@@ -200,7 +197,7 @@ export function validateQuery(
     return [{ id: 'query-object-type-not-recognised' }];
 
   // TODO: refactor (create a standard function or pass as param)
-  const entitySet = moduleData.entitySets.find((x) => x.entityName === qo.type);
+  const entitySet = entitySets.find((x) => x.entityName === qo.type);
 
   const ajvValidator: AnyValidateFunction = getCompiledQuerySchema(entitySet);
   const validateQueryObject = ajvValidator;

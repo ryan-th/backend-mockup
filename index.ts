@@ -82,22 +82,25 @@ function setHtml() {
     .subscribe();
 }
 
+function getModuleDataForQueryPath(queryPath: string): ModuleData {
+  const regExp: RegExp = new RegExp('^/[A-Za-z]*');
+  const stub = regExp.exec(queryPath)?.[0];
+
+  if (['/schools', '/academicSystems'].includes(stub)) {
+    return schoolModuleData;
+  }
+  if (['/cities', 'countries', '/regions'].includes(stub)) {
+    return regionalModuleData;
+  }
+}
+
 function setObservables() {
   const request$ = requestButtonClick$.pipe(map(() => input.value));
 
   response$ = request$.pipe(
     switchMap((queryPath) => {
-      let moduleData: ModuleData;
+      const moduleData = getModuleDataForQueryPath(queryPath);
 
-      if (queryPath.startsWith('/schools')) {
-        moduleData = schoolModuleData;
-      }
-      if (queryPath.startsWith('/academicSystems')) {
-        moduleData = schoolModuleData;
-      }
-      if (queryPath.startsWith('/cities')) {
-        moduleData = regionalModuleData;
-      }
       return getResponseFromRequest$(moduleData, queryPath);
     })
   );

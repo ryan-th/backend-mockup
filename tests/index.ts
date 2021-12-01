@@ -6,7 +6,7 @@ import { getTestResults as getTestResults_parseToTypedValue } from './parseToTyp
 import { getTestResults as getTestResults_validateQuery } from './validateQuery';
 
 export interface BaseTest {
-  functionName?: string; 
+  functionName?: string;
   inputs: any[];
   expect: any;
   result?: any;

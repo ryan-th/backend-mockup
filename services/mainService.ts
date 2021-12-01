@@ -58,7 +58,7 @@ export function getResponseFromRequest$(
   const validateQuery$ = ([moduleData, query]: [ModuleData, Query]) => {
     console.log('query:', query, JSON.stringify(query));
     console.log(24);
-    const queryErrors = validateQuery(moduleData, query);
+    const queryErrors = validateQuery(moduleData.entitySets, query);
     console.log(25);
     query.isValidObject = !queryErrors;
     query.errors = queryErrors;

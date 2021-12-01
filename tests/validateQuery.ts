@@ -1,10 +1,11 @@
 import { BaseTest } from '.';
-import { entitySets } from '../data';
+import { entitySets } from '../modules/regional/data';
 import { Query, QueryError } from '../interfaces/queries';
 import {
   deriveQueryFromQueryPath,
   validateQuery,
 } from '../services/queryService';
+import { regionalModuleData } from '../modules/regional';
 
 interface Test extends BaseTest {
   inputs: Query[];
@@ -37,7 +38,11 @@ export function getTestResults(): BaseTest[] {
 
   const results = tests.map((test) => {
     test.functionName = 'validateQuery';
-    test.result = validateQuery.call(this, ...test.inputs);
+    test.result = validateQuery.call(
+      this,
+      regionalModuleData.entitySets,
+      ...test.inputs
+    );
     test.isSuccess =
       JSON.stringify(test.result) === JSON.stringify(test.expect);
     return test;

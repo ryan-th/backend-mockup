@@ -15,9 +15,6 @@ import {
   EntitySetRelationshipName,
 } from '../interfaces/relationships';
 
-// data
-// import { entitySetRelationships } from '../data';
-
 // services
 import {
   compareFnGenerator,
@@ -100,7 +97,11 @@ export function getResponseFromRequest$(
     entitySetIds,
   ]: [ModuleData, Query, EntitySet, number[]]) => {
     console.log('entitySetIds:', entitySetIds);
-    const relationships$ = getEntitySetRelationships(query, entitySetIds);
+    const relationships$ = getEntitySetRelationships(
+      moduleData,
+      query,
+      entitySetIds
+    );
     return combineLatest([
       of(moduleData),
       of(query),
@@ -328,6 +329,7 @@ function deriveEntitySetIds(entitySet: EntitySet): number[] {
 
 // TODO: move higher
 function getEntitySetRelationships(
+  moduleData: ModuleData,
   query: Query,
   entitySetIds: number[]
 ): Observable<Record<EntityName, EntityRelationship[]> | {}> {
@@ -342,6 +344,7 @@ function getEntitySetRelationships(
     if (toEntityName.includes('.')) return;
 
     const entitySetRelationship = getEntitySetRelationship(
+      moduleData,
       fromEntityName,
       toEntityName
     );

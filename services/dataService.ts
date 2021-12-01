@@ -1,7 +1,8 @@
 import { Entity } from '../interfaces/entities';
+import { ModuleData } from '../interfaces/main';
 import { EntitySetRelationship } from '../interfaces/relationships';
 
-import { entitySetRelationships } from '../data';
+// import { entitySetRelationships } from '../data';
 
 declare namespace FunctionLibrary {
   export type itemMap = (n: any) => any;
@@ -14,11 +15,12 @@ declare namespace FunctionLibrary {
 }
 
 export function getEntitySetRelationship(
+  moduleData: ModuleData,
   fromEntityName: string,
   toEntityName: string
 ): EntitySetRelationship {
   console.log(fromEntityName, toEntityName);
-  return entitySetRelationships.find(
+  return moduleData.entitySetRelationships.find(
     (x) =>
       x.fromEntitySet.entityName === fromEntityName &&
       x.toEntitySet.entityName === toEntityName

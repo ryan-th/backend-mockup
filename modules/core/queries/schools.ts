@@ -1,4 +1,4 @@
-import { Query } from '../interfaces/queries';
+import { Query } from '../../../interfaces/queries';
 
 export function getSchoolQueries(): Query[] {
   return queries;

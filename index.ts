@@ -1,15 +1,12 @@
 import { fromEvent, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
-import { getQueryStatusColor, queries } from './queries/index';
+import { getQueryStatusColor, queries } from './modules/core/queries/index';
 import { runTests } from './shared/services/tests';
 import {
   getModuleDataForQueryPath,
   getResponseFromRequest$,
 } from './shared/services/mainService';
-import { schoolModuleData } from './modules/school';
-import { ModuleData } from './interfaces/main';
-import { regionalModuleData } from './modules/regional';
 
 let input: HTMLInputElement;
 let pre: HTMLPreElement;

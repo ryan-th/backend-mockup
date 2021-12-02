@@ -1,6 +1,6 @@
-import { Query, QueryStatus } from './../interfaces/queries';
+import { Query, QueryStatus } from './../../../interfaces/queries';
 
-import { compareFnGenerator } from '../shared/services/dataService';
+import { compareFnGenerator } from '../../../shared/services/dataService';
 
 import { getAcademicSystemQueries } from './academicSystems';
 import { getCityQueries } from './cities';

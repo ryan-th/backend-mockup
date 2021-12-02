@@ -4,7 +4,7 @@ import { Query, QueryError } from '../interfaces/queries';
 import {
   deriveQueryFromQueryPath,
   validateQuery,
-} from '../services/queryService';
+} from '../shared/services/queryService';
 import { regionalModuleData } from '../modules/regional';
 
 interface Test extends BaseTest {

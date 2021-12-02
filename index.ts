@@ -3,7 +3,7 @@ import { map, switchMap } from 'rxjs/operators';
 
 import { getQueryStatusColor, queries } from './queries/index';
 import { runTests } from './tests';
-import { getResponseFromRequest$ } from './services/mainService';
+import { getResponseFromRequest$ } from './shared/services/mainService';
 import { schoolModuleData } from './modules/school';
 import { ModuleData } from './interfaces/main';
 import { regionalModuleData } from './modules/regional';

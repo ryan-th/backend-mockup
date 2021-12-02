@@ -2,7 +2,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseTest } from '.';
 import { JsonApiDocument } from '../interfaces/responses';
-import { getResponseFromRequest$ } from '../services/mainService';
+import { getResponseFromRequest$ } from '../shared/services/mainService';
 
 interface Test extends BaseTest {
   inputs: string[];

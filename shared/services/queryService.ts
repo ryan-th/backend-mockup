@@ -6,8 +6,8 @@ import {
 } from 'ajv/dist/core';
 
 // interfaces
-import { EntitySet } from '../interfaces/entities';
-import { ModuleData } from '../interfaces/main';
+import { EntitySet } from '../../interfaces/entities';
+import { ModuleData } from '../../interfaces/main';
 import {
   AcademicSystemQueryObject,
   CityQueryObject,
@@ -18,14 +18,14 @@ import {
   QueryObjectKey,
   RegionQueryObject,
   SchoolQueryObject,
-} from '../interfaces/queries';
-import { JsonApiErrorObject } from '../interfaces/responses';
+} from '../../interfaces/queries';
+import { JsonApiErrorObject } from '../../interfaces/responses';
 
 // services
 import { mergeObjects } from './genericServices';
 
 // TODO
-import { QueryParamObject } from '../tests/deriveQueryParamObjectFromQueryParamString';
+import { QueryParamObject } from '../../tests/deriveQueryParamObjectFromQueryParamString';
 
 let ajv: Ajv;
 

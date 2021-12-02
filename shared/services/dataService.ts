@@ -1,6 +1,7 @@
-import { Entity } from '../interfaces/entities';
-import { ModuleData } from '../interfaces/main';
-import { EntitySetRelationship } from '../interfaces/relationships';
+// interfaces
+import { Entity } from '../../interfaces/entities';
+import { ModuleData } from '../../interfaces/main';
+import { EntitySetRelationship } from '../../interfaces/relationships';
 
 // import { entitySetRelationships } from '../data';
 

@@ -3,17 +3,26 @@ import { combineLatest, forkJoin, Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 // interfaces
-import { City, Entity, EntityName, EntitySet } from '../interfaces/entities';
+import {
+  PrimaryData,
+  ResourceObject,
+} from '../../interfaces/3rd-party/jsonapi-typescript';
+import { City, Entity, EntityName, EntitySet } from '../../interfaces/entities';
+import { ModuleData } from '../../interfaces/main';
 import {
   Query,
   QueryObject,
   QueryObjectPage,
   QueryPath,
-} from '../interfaces/queries';
+} from '../../interfaces/queries';
 import {
   EntityRelationship,
   EntitySetRelationshipName,
-} from '../interfaces/relationships';
+} from '../../interfaces/relationships';
+import {
+  JsonApiDocument,
+  JsonApiErrorObject,
+} from '../../interfaces/responses';
 
 // services
 import {
@@ -34,14 +43,7 @@ import {
   isSchoolQueryObject,
   validateQuery,
 } from './queryService';
-import { JsonApiDocument, JsonApiErrorObject } from '../interfaces/responses';
-import {
-  PrimaryData,
-  ResourceObject,
-} from '../interfaces/3rd-party/jsonapi-typescript';
-import { ModuleData } from '../interfaces/main';
-import { allCountryPropertyNames } from '../modules/regional/data/entity-sets/countries';
-// import { allCountryPropertyNames } from '../data/entity-sets/countries';
+import { allCountryPropertyNames } from '../../modules/regional/data/entity-sets/countries';
 // import { ModuleData } from '../modules/school';
 
 // TODO: consider renaming to getJsonApiResponseFromQueryPath?

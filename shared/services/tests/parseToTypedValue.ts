@@ -1,5 +1,5 @@
 import { BaseTest } from '.';
-import { parseToTypedValue } from '../shared/services/queryService';
+import { parseToTypedValue } from '../queryService';
 
 interface Test extends BaseTest {
   inputs: string[];

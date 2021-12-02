@@ -1,5 +1,5 @@
 import { BaseTest } from '.';
-import { deriveQueryParamObjectFromQueryParamString } from '../shared/services/queryService';
+import { deriveQueryParamObjectFromQueryParamString } from '../queryService';
 
 // TODO: move
 export interface QueryParamObject {

@@ -1,11 +1,8 @@
 import { BaseTest } from '.';
-import { entitySets } from '../modules/regional/data';
-import { Query, QueryError } from '../interfaces/queries';
-import {
-  deriveQueryFromQueryPath,
-  validateQuery,
-} from '../shared/services/queryService';
-import { regionalModuleData } from '../modules/regional';
+import { entitySets } from '../../../modules/regional/data';
+import { Query, QueryError } from '../../../interfaces/queries';
+import { deriveQueryFromQueryPath, validateQuery } from '../queryService';
+import { regionalModuleData } from '../../../modules/regional';
 
 interface Test extends BaseTest {
   inputs: Query[];

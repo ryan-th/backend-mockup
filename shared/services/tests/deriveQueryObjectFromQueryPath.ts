@@ -1,7 +1,7 @@
 import { BaseTest } from '.';
-import { QueryObject } from '../interfaces/queries';
-import { regionalModuleData } from '../modules/regional';
-import { deriveQueryObjectFromQueryPath } from '../shared/services/queryService';
+import { QueryObject } from '../../../interfaces/queries';
+import { regionalModuleData } from '../../../modules/regional';
+import { deriveQueryObjectFromQueryPath } from '../queryService';
 
 interface Test extends BaseTest {
   inputs: string[];

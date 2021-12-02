@@ -44,6 +44,8 @@ import {
   validateQuery,
 } from './queryService';
 import { allCountryPropertyNames } from '../../modules/regional/data/entity-sets/countries';
+import { schoolModuleData } from '../../modules/school';
+import { regionalModuleData } from '../../modules/regional';
 // import { ModuleData } from '../modules/school';
 
 // TODO: consider renaming to getJsonApiResponseFromQueryPath?
@@ -474,4 +476,18 @@ function deriveJsonApi(
   };
   if (included2.length > 0) jsonApiDocument.included = included2;
   return jsonApiDocument;
+}
+
+export function getModuleDataForQueryPath(queryPath: string): ModuleData {
+  const regExp: RegExp = new RegExp('^/[A-Za-z]*');
+  const stub = regExp.exec(queryPath)?.[0];
+
+  if (
+    ['/schools', '/academicSystems', '/schoolAcademicSystems'].includes(stub)
+  ) {
+    return schoolModuleData;
+  }
+  if (['/cities', 'countries', '/regions'].includes(stub)) {
+    return regionalModuleData;
+  }
 }

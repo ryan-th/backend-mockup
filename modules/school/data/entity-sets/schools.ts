@@ -23,5 +23,3 @@ export const schools: School[] = [
     hasBeenVisitedByTh: false,
   },
 ];
-
-export const defaultSchoolPropertyNames: (keyof School)[] = ['name', 'slug'];

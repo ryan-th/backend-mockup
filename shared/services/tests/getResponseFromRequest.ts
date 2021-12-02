@@ -1,8 +1,12 @@
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseTest } from '.';
-import { JsonApiDocument } from '../interfaces/responses';
-import { getResponseFromRequest$ } from '../shared/services/mainService';
+import { JsonApiDocument } from '../../../interfaces/responses';
+import { regionalModuleData } from '../../../modules/regional';
+import {
+  getModuleDataForQueryPath,
+  getResponseFromRequest$,
+} from '../mainService';
 
 interface Test extends BaseTest {
   inputs: string[];
@@ -268,63 +272,63 @@ export function getTestResults$(): Observable<Test[]> {
         ],
       },
     },
-    {
-      inputs: ['/schools?include=city&filter[id]=2848,1923'],
-      expect: {
-        data: [
-          {
-            type: 'school',
-            id: '2848',
-            attributes: {
-              name: 'Academie Laurentienne',
-              slug: 'school-slug-1',
-            },
-            relationships: {
-              city: {
-                data: {
-                  type: 'city',
-                  id: '1',
-                },
-              },
-            },
-          },
-          {
-            type: 'school',
-            id: '1923',
-            attributes: {
-              name: 'Bar',
-              slug: 'school-slug-3',
-            },
-            relationships: {
-              city: {
-                data: {
-                  type: 'city',
-                  id: '23',
-                },
-              },
-            },
-          },
-        ],
-        included: [
-          {
-            type: 'city',
-            id: '1',
-            attributes: {
-              name: 'Lisbon',
-              slug: 'city-slug-1',
-            },
-          },
-          {
-            type: 'city',
-            id: '23',
-            attributes: {
-              name: 'Cairo',
-              slug: 'city-slug-3',
-            },
-          },
-        ],
-      },
-    },
+    // {
+    //   inputs: ['/schools?include=city&filter[id]=2848,1923'],
+    //   expect: {
+    //     data: [
+    //       {
+    //         type: 'school',
+    //         id: '2848',
+    //         attributes: {
+    //           name: 'Academie Laurentienne',
+    //           slug: 'school-slug-1',
+    //         },
+    //         relationships: {
+    //           city: {
+    //             data: {
+    //               type: 'city',
+    //               id: '1',
+    //             },
+    //           },
+    //         },
+    //       },
+    //       {
+    //         type: 'school',
+    //         id: '1923',
+    //         attributes: {
+    //           name: 'Bar',
+    //           slug: 'school-slug-3',
+    //         },
+    //         relationships: {
+    //           city: {
+    //             data: {
+    //               type: 'city',
+    //               id: '23',
+    //             },
+    //           },
+    //         },
+    //       },
+    //     ],
+    //     included: [
+    //       {
+    //         type: 'city',
+    //         id: '1',
+    //         attributes: {
+    //           name: 'Lisbon',
+    //           slug: 'city-slug-1',
+    //         },
+    //       },
+    //       {
+    //         type: 'city',
+    //         id: '23',
+    //         attributes: {
+    //           name: 'Cairo',
+    //           slug: 'city-slug-3',
+    //         },
+    //       },
+    //     ],
+    //   },
+    // },
     {
       inputs: [
         '/schoolAcademicSystems?filter[schoolId]=1&include=academicSystems',
@@ -451,8 +455,11 @@ export function getTestResults$(): Observable<Test[]> {
   };
 
   const tests$: Observable<any>[] = tests.map((test) => {
+    const queryPath = test.inputs[0];
+    const moduleData = getModuleDataForQueryPath(queryPath);
+    console.log(56, moduleData, queryPath);
     return getResponseFromRequest$
-      .call(this, ...test.inputs)
+      .call(this, moduleData, ...test.inputs)
       .pipe(map((result: JsonApiDocument) => checkResult(test, result)));
   });
 

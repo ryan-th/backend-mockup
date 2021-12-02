@@ -25,7 +25,7 @@ import { JsonApiErrorObject } from '../../interfaces/responses';
 import { mergeObjects } from './genericServices';
 
 // TODO
-import { QueryParamObject } from '../../tests/deriveQueryParamObjectFromQueryParamString';
+import { QueryParamObject } from './tests/deriveQueryParamObjectFromQueryParamString';
 
 let ajv: Ajv;
 

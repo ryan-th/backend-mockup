@@ -18,26 +18,3 @@ export const academicSystems: AcademicSystem[] = [
     name: 'Indian',
   },
 ];
-
-export const defaultAcademicSystemPropertyNames: (keyof AcademicSystem)[] = [
-  'name',
-];
-
-/*
-  "included": [
-  {
-    type: 'academicSystem",
-    id: 1,
-    attributes: {
-      name: 'International',
-    }
-  },
-  {
-    type: 'city",
-    id: 1,
-    attributes: {
-      name: 'Lisbon',
-    }
-  }
-  ]
-*/

@@ -1,17 +1,15 @@
 // interfaces
 import {
-  EntityName,
+  AcademicSystem,
   EntitySet,
   EntitySetName,
+  School,
 } from '../../../interfaces/entities';
 import { EntitySetRelationship } from '../../../interfaces/relationships';
 
 // entity-sets
-import {
-  academicSystems,
-  defaultAcademicSystemPropertyNames,
-} from './entity-sets/academicSystems';
-import { defaultSchoolPropertyNames, schools } from './entity-sets/schools';
+import { academicSystems } from './entity-sets/academicSystems';
+import { schools } from './entity-sets/schools';
 
 // relationships
 import { schoolAcademicSystems } from './relationships/schoolAcademicSystems';
@@ -22,11 +20,21 @@ import { schoolQueryObjectSchema } from '../queries/schemas/schools';
 import { academicSystemQueryObjectSchema } from '../queries/schemas/academicSystems';
 
 // entitySets
+const allAcademicSystemPropertyNames: (keyof AcademicSystem)[] = ['name'];
+const defaultAcademicSystemPropertyNames: (keyof AcademicSystem)[] = ['name'];
+
+const allSchoolPropertyNames: (keyof School)[] = [
+  'name',
+  'slug',
+  'hasBeenVisitedByTh',
+];
+const defaultSchoolPropertyNames: (keyof School)[] = ['name', 'slug'];
+
 export const entitySets: EntitySet[] = [
   {
     name: 'academicSystems',
     entityName: 'academicSystem',
-    allPropertyNames: ['TODO'],
+    allPropertyNames: allAcademicSystemPropertyNames,
     defaultPropertyNames: defaultAcademicSystemPropertyNames,
     data: academicSystems,
     querySchema: academicSystemQueryObjectSchema,
@@ -34,8 +42,8 @@ export const entitySets: EntitySet[] = [
   {
     name: 'schools',
     entityName: 'school',
-    allPropertyNames: ['TODO'],
-    defaultPropertyNames: ['name', 'slug'], // defaultSchoolPropertyNames,
+    allPropertyNames: allSchoolPropertyNames,
+    defaultPropertyNames: defaultSchoolPropertyNames,
     data: schools,
     querySchema: schoolQueryObjectSchema,
   },

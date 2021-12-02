@@ -2,8 +2,11 @@ import { fromEvent, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 import { getQueryStatusColor, queries } from './queries/index';
-import { runTests } from './tests';
-import { getResponseFromRequest$ } from './shared/services/mainService';
+import { runTests } from './shared/services/tests';
+import {
+  getModuleDataForQueryPath,
+  getResponseFromRequest$,
+} from './shared/services/mainService';
 import { schoolModuleData } from './modules/school';
 import { ModuleData } from './interfaces/main';
 import { regionalModuleData } from './modules/regional';
@@ -15,7 +18,7 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  // runTests();
+  runTests();
 
   setHtml();
   setObservables();
@@ -80,18 +83,6 @@ function setHtml() {
   fromEvent(clearButton, 'click')
     .pipe(map(clearResponseAndConsole))
     .subscribe();
-}
-
-function getModuleDataForQueryPath(queryPath: string): ModuleData {
-  const regExp: RegExp = new RegExp('^/[A-Za-z]*');
-  const stub = regExp.exec(queryPath)?.[0];
-
-  if (['/schools', '/academicSystems'].includes(stub)) {
-    return schoolModuleData;
-  }
-  if (['/cities', 'countries', '/regions'].includes(stub)) {
-    return regionalModuleData;
-  }
 }
 
 function setObservables() {

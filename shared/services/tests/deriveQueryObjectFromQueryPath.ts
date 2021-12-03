@@ -1,6 +1,6 @@
 import { BaseTest } from '.';
 import { QueryObject } from '../../../interfaces/queries';
-import { regionalModuleData } from '../../../modules/regional';
+import { getModuleDataForQueryPath } from '../mainService';
 import { deriveQueryObjectFromQueryPath } from '../queryService';
 
 interface Test extends BaseTest {
@@ -23,12 +23,12 @@ export function getTestResults(): BaseTest[] {
         type: 'city',
       },
     },
-    // {
-    //   inputs: ['/schools'],
-    //   expect: {
-    //     type: 'school',
-    //   },
-    // },
+    {
+      inputs: ['/schools'],
+      expect: {
+        type: 'school',
+      },
+    },
     {
       inputs: ['/cities/2'],
       expect: {
@@ -47,10 +47,12 @@ export function getTestResults(): BaseTest[] {
   ];
 
   const results = tests.map((test) => {
+    const queryPath = test.inputs[0];
+    const moduleData = getModuleDataForQueryPath(queryPath);
     test.functionName = 'deriveQueryObjectFromQueryPath';
     test.result = deriveQueryObjectFromQueryPath.call(
       this,
-      regionalModuleData.entitySets,
+      moduleData.entitySets,
       ...test.inputs
     );
     const strResult = JSON.stringify(test.result);

@@ -1,6 +1,6 @@
 import { City } from '../../../../interfaces/entities';
 
-export let cities: City[] = [
+export const cities: City[] = [
   {
     id: 1,
     name: 'Lisbon',
@@ -25,5 +25,3 @@ export let cities: City[] = [
     imageUrl: 'city-imageUrl-3',
   },
 ];
-
-export const defaultCityPropertyNames: (keyof City)[] = ['name', 'slug'];

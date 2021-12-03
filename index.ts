@@ -4,9 +4,11 @@ import { map, switchMap } from 'rxjs/operators';
 import { getQueryStatusColor, queries } from './modules/core/queries/index';
 import { runTests } from './shared/services/tests';
 import {
-  getModuleDataForQueryPath,
+  // getModuleDataForQueryPath,
   getResponseFromRequest$,
 } from './shared/services/mainService';
+import { structureService } from './shared/services/structureService';
+import { tempCreateRegionalStructure } from './modules/regional';
 
 let input: HTMLInputElement;
 let pre: HTMLPreElement;
@@ -15,7 +17,11 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  runTests();
+  // runTests();
+
+  console.log(100);
+  const foo = structureService;
+  console.log(101, foo);
 
   setHtml();
   setObservables();
@@ -87,9 +93,11 @@ function setObservables() {
 
   response$ = request$.pipe(
     switchMap((queryPath) => {
-      const moduleData = getModuleDataForQueryPath(queryPath);
+      // const moduleData = getModuleDataForQueryPath(queryPath);
 
-      return getResponseFromRequest$(moduleData, queryPath);
+      tempCreateRegionalStructure();
+
+      return getResponseFromRequest$(queryPath);
     })
   );
 }

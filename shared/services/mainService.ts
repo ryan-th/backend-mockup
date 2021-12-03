@@ -25,11 +25,7 @@ import {
 } from '../../interfaces/responses';
 
 // services
-import {
-  compareFnGenerator,
-  entitiesPluck,
-  getEntitySetRelationship,
-} from './dataService';
+import { compareFnGenerator, entitiesPluck } from './dataService';
 import {
   isMatch_entitySetIncludes,
   isMatch_stringMatches,
@@ -43,71 +39,59 @@ import {
   isSchoolQueryObject,
   validateQuery,
 } from './queryService';
-import { allCountryPropertyNames } from '../../modules/regional/data/entity-sets/countries';
-import { schoolModuleData } from '../../modules/school';
-import { regionalModuleData } from '../../modules/regional';
+// import { schoolModuleData } from '../../modules/school';
+import { structureService } from './structureService';
+// import { regionalModuleData } from '../../modules/regional';
+// import { regionalStructureService } from '../../modules/regional/data';
 // import { ModuleData } from '../modules/school';
 
 // TODO: consider renaming to getJsonApiResponseFromQueryPath?
 export function getResponseFromRequest$(
-  moduleData: ModuleData,
+  // moduleData: ModuleData,
   queryPath: QueryPath
 ): Observable<JsonApiDocument> {
   const deriveQuery$ = (queryPath: QueryPath) => {
-    console.log('queryPath:', queryPath);
-    const query = deriveQueryFromQueryPath(moduleData.entitySets, queryPath);
-    return combineLatest([of(moduleData), of(query)]);
+    console.log('queryPath:', queryPath, structureService.entitySets);
+    const query = deriveQueryFromQueryPath(
+      structureService.entitySets,
+      queryPath
+    );
+    return combineLatest([of(query)]);
   };
 
-  const validateQuery$ = ([moduleData, query]: [ModuleData, Query]) => {
+  const validateQuery$ = ([query]: [Query]) => {
     console.log('query:', query, JSON.stringify(query));
     console.log(24);
-    const queryErrors = validateQuery(moduleData.entitySets, query);
+    const queryErrors = validateQuery(structureService.entitySets, query);
     console.log(25);
     query.isValidObject = !queryErrors;
     query.errors = queryErrors;
-    return combineLatest([of(moduleData), of(query), of(queryErrors)]);
+    return combineLatest([of(query), of(queryErrors)]);
   };
 
-  const getEntitySet$ = ([moduleData, query, queryErrors]: [
-    ModuleData,
+  const getEntitySet$ = ([query, queryErrors]: [
     Query,
     JsonApiErrorObject[]
   ]) => {
     console.log('queryErrors:', queryErrors);
-    const entitySet$ = getEntitySet(moduleData, query);
-    return combineLatest([of(moduleData), of(query), entitySet$]);
+    const entitySet$ = getEntitySetFoo(query);
+    return combineLatest([of(query), entitySet$]);
   };
 
-  const deriveEntitySetIds$ = ([moduleData, query, entitySet]: [
-    ModuleData,
-    Query,
-    EntitySet
-  ]) => {
+  const deriveEntitySetIds$ = ([query, entitySet]: [Query, EntitySet]) => {
     console.log('entitySet:', entitySet);
     const entitySetIds = deriveEntitySetIds(entitySet);
-    return combineLatest([
-      of(moduleData),
-      of(query),
-      of(entitySet),
-      of(entitySetIds),
-    ]);
+    return combineLatest([of(query), of(entitySet), of(entitySetIds)]);
   };
 
-  const getEntitySetRelationships$ = ([
-    moduleData,
-    query,
-    entitySet,
-    entitySetIds,
-  ]: [ModuleData, Query, EntitySet, number[]]) => {
+  const getEntitySetRelationships$ = ([query, entitySet, entitySetIds]: [
+    Query,
+    EntitySet,
+    number[]
+  ]) => {
     console.log('entitySetIds:', entitySetIds);
-    const relationships$ = getEntitySetRelationships(
-      moduleData,
-      query,
-      entitySetIds
-    );
+    const relationships$ = getEntitySetRelationships(query, entitySetIds);
     return combineLatest([
-      of(moduleData),
       of(query),
       of(entitySet),
       of(entitySetIds),
@@ -115,28 +99,15 @@ export function getResponseFromRequest$(
     ]);
   };
 
-  const getIncluded$ = ([
-    moduleData,
-    query,
-    entitySet,
-    entitySetIds,
-    relationships,
-  ]: [
-    ModuleData,
+  const getIncluded$ = ([query, entitySet, entitySetIds, relationships]: [
     Query,
     EntitySet,
     number[],
     {} | Record<EntityName, EntityRelationship[]>
   ]) => {
     console.log('relationships:', relationships);
-    const included$ = getIncluded(
-      moduleData,
-      query,
-      entitySetIds,
-      relationships
-    );
+    const included$ = getIncluded(query, entitySetIds, relationships);
     return combineLatest([
-      of(moduleData),
       of(query),
       of(entitySet),
       of(entitySetIds),
@@ -146,14 +117,12 @@ export function getResponseFromRequest$(
   };
 
   const deriveJsonApi$ = ([
-    moduleData,
     query,
     entitySet,
     entitySetIds,
     relationships,
     included,
   ]: [
-    ModuleData,
     Query,
     EntitySet,
     number[],
@@ -161,13 +130,7 @@ export function getResponseFromRequest$(
     Entity[]
   ]): Observable<JsonApiDocument> => {
     console.log('included:', included);
-    const jsonApi = deriveJsonApi(
-      moduleData,
-      query,
-      entitySet,
-      relationships,
-      included
-    );
+    const jsonApi = deriveJsonApi(query, entitySet, relationships, included);
     return of(jsonApi);
   };
 
@@ -209,17 +172,16 @@ function pageData(data: Entity[], page: QueryObjectPage): Entity[] {
 }
 
 // TODO: move higher
-function getEntitySet(
-  moduleData: ModuleData,
-  query: Query
-): Observable<EntitySet> {
+function getEntitySetFoo(query: Query): Observable<EntitySet> {
   // TODO: gradually improve matching to query
   const qo: QueryObject = query.object;
   let entitySet: EntitySet;
 
   if (!query.isValidObject) return of(null);
 
-  entitySet = { ...moduleData.entitySets.find((x) => x.entityName == qo.type) };
+  entitySet = {
+    ...structureService.entitySets.find((x) => x.entityName == qo.type),
+  };
 
   if (isAcademicSystemQueryObject(qo)) {
     let data = entitySet.data;
@@ -245,9 +207,12 @@ function getEntitySet(
 
       // TODO: make more generic; move to function
       const esi = isMatch_entitySetIncludes;
-      const isMatch = allCountryPropertyNames.every((p) =>
-        esi(x[`country.${p}`], qo.filter[`country.${p}`]?.in)
-      );
+
+      const isMatch = structureService
+        .getEntitySet('countries')
+        .allPropertyNames.every((p) =>
+          esi(x[`country.${p}`], qo.filter[`country.${p}`]?.in)
+        );
       if (!isMatch) return false;
 
       if (!isMatch_stringMatches(x.name, qo.filter.name?.matches)) return false;
@@ -333,7 +298,6 @@ function deriveEntitySetIds(entitySet: EntitySet): number[] {
 
 // TODO: move higher
 function getEntitySetRelationships(
-  moduleData: ModuleData,
   query: Query,
   entitySetIds: number[]
 ): Observable<Record<EntityName, EntityRelationship[]> | {}> {
@@ -347,8 +311,7 @@ function getEntitySetRelationships(
     // console.log(111, toEntityName);
     if (toEntityName.includes('.')) return;
 
-    const entitySetRelationship = getEntitySetRelationship(
-      moduleData,
+    const entitySetRelationship = structureService.getEntitySetRelationship(
       fromEntityName,
       toEntityName
     );
@@ -367,7 +330,6 @@ function getEntitySetRelationships(
 
 // TODO: move higher
 function getIncluded(
-  moduleData: ModuleData,
   query: Query,
   entitySetIds: number[],
   relationships: Record<EntitySetRelationshipName, EntityRelationship[]> | {}
@@ -381,10 +343,10 @@ function getIncluded(
   // console.log(555, qo, relationships, Object.keys(relationships));
 
   Object.keys(entityRelationships).forEach((entitySetRelationshipName) => {
-    const entitySetRelationship = moduleData.entitySetRelationships.find(
+    const entitySetRelationship = structureService.entitySetRelationships.find(
       (x) => x.name === entitySetRelationshipName
     );
-    const entitySet = moduleData.entitySets.find(
+    const entitySet = structureService.entitySets.find(
       (x) => x.entityName === entitySetRelationship.toEntitySet.entityName
     );
     const toIds = [
@@ -422,7 +384,6 @@ function getIncluded(
 // TODO: move higher
 // TODO: construct correct jsonApi
 function deriveJsonApi(
-  moduleData: ModuleData,
   query: Query,
   entitySet: EntitySet,
   relationships: {} | Record<EntityName, EntityRelationship[]>,
@@ -444,9 +405,8 @@ function deriveJsonApi(
     Object.keys(relationships).forEach((key) => {
       if (!item.relationships) item.relationships = {};
 
-      const entitySetRelationship = moduleData.entitySetRelationships.find(
-        (x) => x.name === key
-      );
+      const entitySetRelationship =
+        structureService.entitySetRelationships.find((x) => x.name === key);
 
       const entityRelationship = relationships[key]?.find(
         (rel: EntityRelationship) => id === rel.fromId
@@ -478,16 +438,16 @@ function deriveJsonApi(
   return jsonApiDocument;
 }
 
-export function getModuleDataForQueryPath(queryPath: string): ModuleData {
-  const regExp: RegExp = new RegExp('^/[A-Za-z]*');
-  const stub = regExp.exec(queryPath)?.[0];
+// export function getModuleDataForQueryPath(queryPath: string): ModuleData {
+//   const regExp: RegExp = new RegExp('^/[A-Za-z]*');
+//   const stub = regExp.exec(queryPath)?.[0];
 
-  if (
-    ['/schools', '/academicSystems', '/schoolAcademicSystems'].includes(stub)
-  ) {
-    return schoolModuleData;
-  }
-  if (['/cities', 'countries', '/regions'].includes(stub)) {
-    return regionalModuleData;
-  }
-}
+//   if (
+//     ['/schools', '/academicSystems', '/schoolAcademicSystems'].includes(stub)
+//   ) {
+//     return schoolModuleData;
+//   }
+//   if (['/cities', 'countries', '/regions'].includes(stub)) {
+//     return regionalModuleData;
+//   }
+// }

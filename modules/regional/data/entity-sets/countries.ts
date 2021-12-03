@@ -20,11 +20,3 @@ export const countries: Country[] = [
     slug: 'country-slug-3',
   },
 ];
-
-export const allCountryPropertyNames: (keyof Country)[] = [
-  'id',
-  'type',
-  'name',
-  'slug',
-];
-export const defaultCountryPropertyNames: (keyof Country)[] = ['name', 'slug'];

@@ -7,7 +7,6 @@ import {
 
 // interfaces
 import { EntitySet } from '../../interfaces/entities';
-import { ModuleData } from '../../interfaces/main';
 import {
   AcademicSystemQueryObject,
   CityQueryObject,
@@ -49,6 +48,7 @@ export function deriveQueryFromQueryPath(
   entitySets: EntitySet[],
   queryPath: string
 ): Query {
+  console.log(33, entitySets, queryPath);
   const queryObject = deriveQueryObjectFromQueryPath(entitySets, queryPath);
 
   // TODO: refactor
@@ -64,6 +64,7 @@ export function deriveQueryObjectFromQueryPath(
   entitySets: EntitySet[],
   queryPath: string
 ): QueryObject {
+  console.log(34, entitySets, queryPath);
   // /cities/1 => { type: 'city', filter: { id: { in: [1] } } }
   // see tests for more examples
   if (queryPath == null) return;

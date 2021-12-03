@@ -457,7 +457,6 @@ export function getTestResults$(): Observable<Test[]> {
   const tests$: Observable<any>[] = tests.map((test) => {
     const queryPath = test.inputs[0];
     const moduleData = getModuleDataForQueryPath(queryPath);
-    console.log(56, moduleData, queryPath);
     return getResponseFromRequest$
       .call(this, moduleData, ...test.inputs)
       .pipe(map((result: JsonApiDocument) => checkResult(test, result)));

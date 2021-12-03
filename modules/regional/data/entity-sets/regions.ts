@@ -20,5 +20,3 @@ export const regions: Region[] = [
     slug: 'africa',
   },
 ];
-
-export const defaultRegionPropertyNames: (keyof Region)[] = ['name', 'slug'];

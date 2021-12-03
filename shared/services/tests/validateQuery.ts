@@ -1,8 +1,9 @@
 import { BaseTest } from '.';
-import { entitySets } from '../../../modules/regional/data';
+// import { entitySets } from '../../../modules/regional/data';
 import { Query, QueryError } from '../../../interfaces/queries';
 import { deriveQueryFromQueryPath, validateQuery } from '../queryService';
 import { regionalModuleData } from '../../../modules/regional';
+import { regionalStructureService } from '../../../modules/regional/data';
 
 interface Test extends BaseTest {
   inputs: Query[];
@@ -14,6 +15,7 @@ interface Test extends BaseTest {
 
 export function getTestResults(): BaseTest[] {
   const prepare = deriveQueryFromQueryPath;
+  const entitySets = regionalStructureService.entitySets;
   const tests: Test[] = [
     {
       inputs: [prepare(entitySets, '/cities')],

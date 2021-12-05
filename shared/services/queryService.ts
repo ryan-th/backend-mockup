@@ -64,7 +64,7 @@ export function deriveQueryObjectFromQueryPath(
   entitySets: EntitySet[],
   queryPath: string
 ): QueryObject {
-  console.log(34, entitySets, queryPath);
+  // console.log(34, entitySets, queryPath);
   // /cities/1 => { type: 'city', filter: { id: { in: [1] } } }
   // see tests for more examples
   if (queryPath == null) return;

@@ -28,7 +28,7 @@ export function getQueryStatusColor(queryStatus: QueryStatus): string {
 
 function getQueries(): Query[] {
   // edit this to whichever query you're currently working on
-  const defaultQuerySlug = 'cities-filterByCountryId';
+  const defaultQuerySlug = 'cities-includeCountry';
 
   let queries: Query[] = [
     ...getAcademicSystemQueries(),

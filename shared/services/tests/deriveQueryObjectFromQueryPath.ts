@@ -1,7 +1,9 @@
 import { BaseTest } from '.';
 import { QueryObject } from '../../../interfaces/queries';
-import { getModuleDataForQueryPath } from '../mainService';
+import { mainModuleService } from '../../../modules/main';
+// import { getModuleDataForQueryPath } from '../mainService';
 import { deriveQueryObjectFromQueryPath } from '../queryService';
+import { structureService } from '../structureService';
 
 interface Test extends BaseTest {
   inputs: string[];
@@ -48,11 +50,12 @@ export function getTestResults(): BaseTest[] {
 
   const results = tests.map((test) => {
     const queryPath = test.inputs[0];
-    const moduleData = getModuleDataForQueryPath(queryPath);
+    mainModuleService.createStructure();
+
     test.functionName = 'deriveQueryObjectFromQueryPath';
     test.result = deriveQueryObjectFromQueryPath.call(
       this,
-      moduleData.entitySets,
+      structureService.entitySets,
       ...test.inputs
     );
     const strResult = JSON.stringify(test.result);

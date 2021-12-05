@@ -15,6 +15,7 @@ export interface BaseTest {
 
 export function runTests(): void {
   // TODO: merge the handling of non-observables and observables
+  console.log('runTests - start');
 
   // non-observables
   const results = [

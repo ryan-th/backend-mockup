@@ -1,4 +1,4 @@
-import { Country } from '../../../../interfaces/entities';
+import { Country } from '../../../../../interfaces/entities';
 
 export const countries: Country[] = [
   {

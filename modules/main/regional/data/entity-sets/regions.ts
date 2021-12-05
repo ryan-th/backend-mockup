@@ -1,4 +1,4 @@
-import { Region } from '../../../../interfaces/entities';
+import { Region } from '../../../../../interfaces/entities';
 
 export const regions: Region[] = [
   {

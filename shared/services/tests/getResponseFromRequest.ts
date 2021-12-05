@@ -2,11 +2,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseTest } from '.';
 import { JsonApiDocument } from '../../../interfaces/responses';
-import { regionalModuleData } from '../../../modules/regional';
-import {
-  getModuleDataForQueryPath,
-  getResponseFromRequest$,
-} from '../mainService';
+import { getResponseFromRequest$ } from '../mainService';
 
 interface Test extends BaseTest {
   inputs: string[];
@@ -456,9 +452,8 @@ export function getTestResults$(): Observable<Test[]> {
 
   const tests$: Observable<any>[] = tests.map((test) => {
     const queryPath = test.inputs[0];
-    const moduleData = getModuleDataForQueryPath(queryPath);
     return getResponseFromRequest$
-      .call(this, moduleData, ...test.inputs)
+      .call(this, ...test.inputs)
       .pipe(map((result: JsonApiDocument) => checkResult(test, result)));
   });
 

@@ -9,15 +9,16 @@ import {
   EntityRelationship,
   EntitySetRelationship,
   EntitySetRelationshipName,
+  EntitySetRelationshipType,
 } from '../../interfaces/relationships';
 
 export const structureService: {
-  addEntitySet: Function;
-  addEntitySetRelationship: Function;
+  addEntitySet: typeof addEntitySet;
+  addEntitySetRelationship: typeof addEntitySetRelationship;
   entitySets: EntitySet[];
   entitySetRelationships: EntitySetRelationship[];
   getEntitySet: (entitySetName: EntitySetName) => EntitySet;
-  getEntitySetRelationship: Function;
+  getEntitySetRelationship: typeof getEntitySetRelationship;
 } = {
   addEntitySet: addEntitySet,
   addEntitySetRelationship: addEntitySetRelationship,
@@ -35,7 +36,6 @@ function addEntitySet(
   data: Entity[],
   querySchema: JSONSchema7
 ) {
-  console.log(81);
   const entitySet: EntitySet = {
     name: name,
     entityName: entityName,
@@ -49,6 +49,10 @@ function addEntitySet(
 
 function getEntitySet(entitySetName: EntitySetName): EntitySet {
   return structureService.entitySets.find((x) => x.name === entitySetName);
+}
+
+function getEntitySetFromEntityName(entityName: EntityName): EntitySet {
+  return structureService.entitySets.find((x) => x.entityName === entityName);
 }
 
 function getEntitySetRelationship(
@@ -66,6 +70,8 @@ function addEntitySetRelationship(
   name: EntitySetRelationshipName,
   fromEntityName: EntitySetName,
   toEntityName: EntitySetName,
+  relationshipType: EntitySetRelationshipType,
+  includeName: string,
   data: EntityRelationship[],
   sqlFrom: string
 ) {
@@ -75,15 +81,19 @@ function addEntitySetRelationship(
     name: name,
     fromEntitySet: fromEntitySet,
     toEntitySet: toEntitySet,
+    relationshipType: relationshipType,
+    includeName: includeName,
     data: data,
     sqlFrom: sqlFrom,
   };
+  fromEntitySet.relationships = fromEntitySet.relationships || [];
+  fromEntitySet.relationships.push(rel);
   structureService.entitySetRelationships.push(rel);
   addRelatedPropertiesToEntity(rel);
 }
 
 function addRelatedPropertiesToEntity(rel: EntitySetRelationship) {
-  console.log(13);
+  // console.log(13);
   rel.fromEntitySet?.data.forEach((item) => {
     const toId = rel.data.find((x) => x.fromId == item.id)?.toId;
     const toEntity = rel.toEntitySet.data.find((co) => co.id == toId);
@@ -93,7 +103,4 @@ function addRelatedPropertiesToEntity(rel: EntitySetRelationship) {
         toEntity[propertyName];
     });
   });
-  console.log(14);
 }
-
-console.log(23);

@@ -11,10 +11,15 @@ export type EntitySetRelationshipName =
   | 'schoolCities'
   | 'cityCountries';
 
+export type EntitySetRelationshipType = '1-1' | '1-many';
+
 export type EntitySetRelationship = {
   name: EntitySetRelationshipName;
   fromEntitySet: EntitySet;
   toEntitySet: EntitySet;
   data: EntityRelationship[];
   sqlFrom: string;
+  relationshipType: EntitySetRelationshipType;
+  // WIP
+  includeName: string;
 };

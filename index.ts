@@ -1,14 +1,17 @@
 import { fromEvent, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
-import { getQueryStatusColor, queries } from './modules/core/queries/index';
+import {
+  getQueryStatusColor,
+  queries,
+} from './modules/stackblitz-core/queries/index';
 import { runTests } from './shared/services/tests';
 import {
   // getModuleDataForQueryPath,
   getResponseFromRequest$,
 } from './shared/services/mainService';
 import { structureService } from './shared/services/structureService';
-import { tempCreateRegionalStructure } from './modules/regional';
+import { mainModuleService } from './modules/main';
 
 let input: HTMLInputElement;
 let pre: HTMLPreElement;
@@ -17,7 +20,7 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  // runTests();
+  // runTests(); 
 
   console.log(100);
   const foo = structureService;
@@ -95,7 +98,7 @@ function setObservables() {
     switchMap((queryPath) => {
       // const moduleData = getModuleDataForQueryPath(queryPath);
 
-      tempCreateRegionalStructure();
+      mainModuleService.createStructure();
 
       return getResponseFromRequest$(queryPath);
     })

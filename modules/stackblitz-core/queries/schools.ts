@@ -6,6 +6,12 @@ export function getSchoolQueries(): Query[] {
 
 const queries: Query[] = [
   {
+    slug: 'schools-includeAcademicSystems',
+    path: '/schools/2848?include=academicSystems',
+    status: 'TODO',
+    description: 'WIP',
+  },
+  {
     slug: 'schools-includeComplex1',
     path: '/schools?fields[school]=name,hasBeenVisitedByTh&filter[city.id]=1,2&include=city,academicSystem&fields[city]=name',
     status: 'TODO',
@@ -30,7 +36,7 @@ const queries: Query[] = [
   },
   {
     slug: 'schools-includeMultiple',
-    path: '/schools?include=city,academicSystem&filter[id]=2848,1923',
+    path: '/schools?include=city,academicSystems&filter[id]=2848,1923',
     status: 'TODO',
     description:
       'need multiple academicSystem relationships (academicSystem.data needs to be an array)',

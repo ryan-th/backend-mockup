@@ -1,6 +1,7 @@
 // generic
 
 import { JSONSchema7 } from 'json-schema';
+import { EntitySetRelationship } from './relationships';
 
 export type EntitySetName =
   | 'academicSystems'
@@ -28,6 +29,7 @@ export interface EntitySet {
   defaultPropertyNames: string[];
   data: Entity[];
   querySchema: JSONSchema7;
+  relationships?: EntitySetRelationship[];
 }
 
 // specific

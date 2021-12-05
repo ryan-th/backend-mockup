@@ -1,5 +1,5 @@
 // interfaces
-import { City, Country, Region } from '../../interfaces/entities';
+import { City, Country, Region } from '../../../interfaces/entities';
 
 // entity-sets
 import { cities } from './data/entity-sets/cities';
@@ -11,36 +11,35 @@ import { cityCountries } from './data/relationships/cityCountries';
 // schemas
 import { cityQueryObjectSchema } from './query-schemas/cities';
 import { regions } from './data/entity-sets/regions';
-import { structureService } from '../../shared/services/structureService';
+import { structureService } from '../../../shared/services/structureService';
 import { countryRegions } from './data/relationships/countryRegions';
 
-export function tempCreateRegionalStructure() {
-  main();
-}
+export const regionalService = {
+  createStructure: createStructure,
+};
 
-function main() {
-  console.log(98);
-  structureService.entitySets = [];
-  structureService.entitySetRelationships = [];
-  addRegion();
-  addCountry();
+function createStructure() {
+  // entities
   addCity();
-  console.log(99, structureService);
+  addCountry();
+  addRegion();
+
+  // relationships
+  addCountryRegions();
+  addCityCountries();
 }
 
-main();
-
-function addRegion() {
-  const allPropertyNames: (keyof Region)[] = ['name', 'slug'];
-  const defaultPropertyNames: (keyof Region)[] = ['name', 'slug'];
+// entities
+function addCity() {
+  const allPropertyNames: (keyof City)[] = ['name', 'slug', 'imageUrl'];
+  const defaultPropertyNames: (keyof City)[] = ['name', 'slug'];
   structureService.addEntitySet(
-    'regions',
-    'region',
+    'cities',
+    'city',
     allPropertyNames,
     defaultPropertyNames,
-    regions,
-    // regionQueryObjectSchema
-    null
+    cities,
+    cityQueryObjectSchema
   );
 }
 
@@ -56,31 +55,43 @@ function addCountry() {
     // countryQueryObjectSchema
     null
   );
-  structureService.addEntitySetRelationship(
-    'countryRegions',
-    'countries',
+}
+
+function addRegion() {
+  const allPropertyNames: (keyof Region)[] = ['name', 'slug'];
+  const defaultPropertyNames: (keyof Region)[] = ['name', 'slug'];
+  structureService.addEntitySet(
     'regions',
-    countryRegions,
-    ''
+    'region',
+    allPropertyNames,
+    defaultPropertyNames,
+    regions,
+    // regionQueryObjectSchema
+    null
   );
 }
 
-function addCity() {
-  const allPropertyNames: (keyof City)[] = ['name', 'slug', 'imageUrl'];
-  const defaultPropertyNames: (keyof City)[] = ['name', 'slug'];
-  structureService.addEntitySet(
-    'cities',
-    'city',
-    allPropertyNames,
-    defaultPropertyNames,
-    cities,
-    cityQueryObjectSchema
-  );
+// relationships
+function addCityCountries() {
   structureService.addEntitySetRelationship(
     'cityCountries',
     'cities',
     'countries',
+    '1-1',
+    'country',
     cityCountries,
+    ''
+  );
+}
+
+function addCountryRegions() {
+  structureService.addEntitySetRelationship(
+    'countryRegions',
+    'countries',
+    'regions',
+    '1-1',
+    'region',
+    countryRegions,
     ''
   );
 }

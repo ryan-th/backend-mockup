@@ -47,11 +47,10 @@ import { structureService } from './structureService';
 
 // TODO: consider renaming to getJsonApiResponseFromQueryPath?
 export function getResponseFromRequest$(
-  // moduleData: ModuleData,
   queryPath: QueryPath
 ): Observable<JsonApiDocument> {
   const deriveQuery$ = (queryPath: QueryPath) => {
-    console.log('queryPath:', queryPath, structureService.entitySets);
+    console.log('queryPath:', queryPath);
     const query = deriveQueryFromQueryPath(
       structureService.entitySets,
       queryPath
@@ -90,7 +89,11 @@ export function getResponseFromRequest$(
     number[]
   ]) => {
     console.log('entitySetIds:', entitySetIds);
-    const relationships$ = getEntitySetRelationships(query, entitySetIds);
+    const relationships$ = getEntitySetRelationships(
+      query,
+      entitySet,
+      entitySetIds
+    );
     return combineLatest([
       of(query),
       of(entitySet),
@@ -299,24 +302,19 @@ function deriveEntitySetIds(entitySet: EntitySet): number[] {
 // TODO: move higher
 function getEntitySetRelationships(
   query: Query,
+  entitySet: EntitySet,
   entitySetIds: number[]
 ): Observable<Record<EntityName, EntityRelationship[]> | {}> {
   // TODO: consider this returning all 'relationships' AND 'included'
   if (!query.isValidObject) return of({});
 
   const relationships: Record<string, Observable<EntityRelationship[]>> = {};
-  const fromEntityName = query.object.type;
 
-  query.object.include?.forEach((toEntityName) => {
-    // console.log(111, toEntityName);
-    if (toEntityName.includes('.')) return;
-
-    const entitySetRelationship = structureService.getEntitySetRelationship(
-      fromEntityName,
-      toEntityName
+  query.object.include?.forEach((includeName) => {
+    if (includeName.includes('.')) return;
+    const entitySetRelationship = entitySet.relationships.find(
+      (x) => x.includeName === includeName
     );
-    // console.log(99, entitySetRelationship);
-    // const subQuery = deriveSubQuery(query, entityName);
     const filteredRelationship = entitySetRelationship.data.filter((x) =>
       entitySetIds.includes(x.fromId)
     );

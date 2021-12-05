@@ -1,9 +1,9 @@
 import { BaseTest } from '.';
 // import { entitySets } from '../../../modules/regional/data';
 import { Query, QueryError } from '../../../interfaces/queries';
+import { mainModuleService } from '../../../modules/main';
 import { deriveQueryFromQueryPath, validateQuery } from '../queryService';
-import { regionalModuleData } from '../../../modules/regional';
-import { regionalStructureService } from '../../../modules/regional/data';
+import { structureService } from '../structureService';
 
 interface Test extends BaseTest {
   inputs: Query[];
@@ -15,7 +15,9 @@ interface Test extends BaseTest {
 
 export function getTestResults(): BaseTest[] {
   const prepare = deriveQueryFromQueryPath;
-  const entitySets = regionalStructureService.entitySets;
+  mainModuleService.createStructure();
+  const entitySets = structureService.entitySets;
+  // const entitySets = mainModuleService.entitySets;
   const tests: Test[] = [
     {
       inputs: [prepare(entitySets, '/cities')],
@@ -37,11 +39,7 @@ export function getTestResults(): BaseTest[] {
 
   const results = tests.map((test) => {
     test.functionName = 'validateQuery';
-    test.result = validateQuery.call(
-      this,
-      regionalModuleData.entitySets,
-      ...test.inputs
-    );
+    test.result = validateQuery.call(this, entitySets, ...test.inputs);
     test.isSuccess =
       JSON.stringify(test.result) === JSON.stringify(test.expect);
     return test;

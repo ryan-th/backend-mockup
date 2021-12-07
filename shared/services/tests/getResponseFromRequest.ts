@@ -326,6 +326,7 @@ export function getTestResults$(): Observable<Test[]> {
     //   },
     // },
     {
+      status: 'TODO',
       inputs: [
         '/schoolAcademicSystems?filter[schoolId]=1&include=academicSystems',
       ],
@@ -379,6 +380,7 @@ export function getTestResults$(): Observable<Test[]> {
       },
     },
     {
+      status: 'TODO',
       inputs: ['/cities/1?include=country,country.region'],
       expect: {
         data: [

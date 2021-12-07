@@ -1,3 +1,5 @@
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { getTestResults as getTestResults_deriveQueryObjectFromQueryPath } from './deriveQueryObjectFromQueryPath';
 import { getTestResults as getTestResults_deriveQueryParamObjectFromQueryParamString } from './deriveQueryParamObjectFromQueryParamString';
 import { getTestResults$ as getTestResults_getResponseFromRequest$ } from './getResponseFromRequest';
@@ -10,26 +12,26 @@ export interface BaseTest {
   expect: any;
   result?: any;
   isSuccess?: boolean;
+  status?: 'TODO' | 'WIP';
   note?: string;
 }
 
-export function runTests(): void {
-  // TODO: merge the handling of non-observables and observables
-  console.log('runTests - start');
-
-  // non-observables
-  const results = [
+export function getTestResults(): Observable<BaseTest[]> {
+  // returns the results from all tests
+  const nonObservableResults = [
     ...getTestResults_deriveQueryObjectFromQueryPath(),
     ...getTestResults_deriveQueryParamObjectFromQueryParamString(),
     ...getTestResults_parseToTypedValue(),
     ...getTestResults_validateQuery(),
   ];
-  const errors = results.filter((x) => !x.isSuccess);
-  if (errors.length > 0) console.log('Test errors (non-observables):', errors);
 
-  // observables
-  getTestResults_getResponseFromRequest$().subscribe((results) => {
-    const errors = results.filter((x) => !x.isSuccess);
-    if (errors.length > 0) console.log('Test errors (observables):', errors);
-  });
+  return getTestResults_getResponseFromRequest$().pipe(
+    map((observableResults) => {
+      const allResults = [...nonObservableResults, ...observableResults];
+
+      // const allErrors = allResults.filter((x) => !x.isSuccess);
+      // if (allErrors.length > 0) console.log('Test errors:', allErrors);
+      return allResults;
+    })
+  );
 }

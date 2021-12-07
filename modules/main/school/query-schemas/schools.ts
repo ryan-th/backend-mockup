@@ -121,7 +121,12 @@ export const schoolQueryObjectSchema: JSONSchema7 = {
     },
     include: {
       items: {
-        enum: ['academicSystem', 'city', 'city.country', 'city.country.region'],
+        enum: [
+          'academicSystems',
+          'city',
+          'city.country',
+          'city.country.region',
+        ],
         type: 'string',
       },
       type: 'array',

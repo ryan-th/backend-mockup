@@ -392,7 +392,8 @@ function deriveJsonApi(
       errors: query.errors,
     };
   }
-  // TODO: remove hard-coding
+
+  console.log(41, query, entitySet, relationships, included);
   const data = <PrimaryData>entitySet.data.map(({ id, ...rest }) => {
     const item: Partial<ResourceObject<any, any>> = {
       type: query.object.type,
@@ -409,8 +410,11 @@ function deriveJsonApi(
       const entityRelationship = relationships[key]?.find(
         (rel: EntityRelationship) => id === rel.fromId
       );
+
+      console.log(42, key, entitySetRelationship, entityRelationship);
+
       if (entityRelationship) {
-        item.relationships[entitySetRelationship.toEntitySet.entityName] = {
+        item.relationships[entitySetRelationship.includeName] = {
           data: {
             type: entitySetRelationship.toEntitySet.entityName,
             id: entityRelationship.toId.toString(),

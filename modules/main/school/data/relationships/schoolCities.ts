@@ -1,6 +1,6 @@
 import { EntityRelationship } from '../../../../../interfaces/relationships';
 
-export const schoolCities: EntityRelationship[] = [
+export const relSchoolCities: EntityRelationship[] = [
   {
     fromId: 2848,
     toId: 1,

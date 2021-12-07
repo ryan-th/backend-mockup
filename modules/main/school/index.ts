@@ -1,9 +1,14 @@
-import { AcademicSystem, School } from '../../../interfaces/entities';
+import {
+  AcademicSystem,
+  School,
+  SchoolAcademicSystem,
+} from '../../../interfaces/entities';
 import { structureService } from '../../../shared/services/structureService';
 import { academicSystems } from './data/entity-sets/academicSystems';
+import { schoolAcademicSystems } from './data/entity-sets/schoolAcademicSystems';
 import { schools } from './data/entity-sets/schools';
-import { schoolAcademicSystems } from './data/relationships/schoolAcademicSystems';
-import { schoolCities } from './data/relationships/schoolCities';
+import { relSchoolAcademicSystems } from './data/relationships/schoolAcademicSystems';
+import { relSchoolCities } from './data/relationships/schoolCities';
 import { academicSystemQueryObjectSchema } from './query-schemas/academicSystems';
 import { schoolQueryObjectSchema } from './query-schemas/schools';
 
@@ -54,6 +59,27 @@ function addSchool() {
   );
 }
 
+function addSchoolAcademicSystem() {
+  const allPropertyNames: (keyof SchoolAcademicSystem)[] = [
+    'schoolId',
+    'academicSystemId',
+    'notes',
+  ];
+  const defaultPropertyNames: (keyof SchoolAcademicSystem)[] = [
+    'schoolId',
+    'academicSystemId',
+  ];
+
+  structureService.addEntitySet(
+    'schoolAcademicSystems',
+    'schoolAcademicSystem',
+    allPropertyNames,
+    defaultPropertyNames,
+    schoolAcademicSystems,
+    null
+  );
+}
+
 // relationships
 function addSchoolAcademicSystems() {
   structureService.addEntitySetRelationship(
@@ -62,7 +88,7 @@ function addSchoolAcademicSystems() {
     'academicSystems',
     '1-many',
     'academicSystems',
-    schoolAcademicSystems,
+    relSchoolAcademicSystems,
     'INNER JOIN aSchoolAcademicSystems sas ON s.id = sas.schoolId INNER JOIN aAcademicSystems `as` ON sas.academicSystemId = `as`.id'
   );
 }
@@ -74,7 +100,7 @@ function addSchoolCities() {
     'cities',
     '1-1',
     'city',
-    schoolCities,
+    relSchoolCities,
     ''
   );
 }

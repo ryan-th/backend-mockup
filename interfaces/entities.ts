@@ -8,14 +8,16 @@ export type EntitySetName =
   | 'cities'
   | 'countries'
   | 'regions'
-  | 'schools';
+  | 'schools'
+  | 'schoolAcademicSystems';
 
 export type EntityName =
   | 'academicSystem'
   | 'city'
   | 'country'
   | 'region'
-  | 'school';
+  | 'school'
+  | 'schoolAcademicSystem';
 
 export interface Entity {
   type?: EntityName; // possibly temporary
@@ -58,4 +60,10 @@ export interface School extends Entity {
   slug: string;
   // cityId: number;
   hasBeenVisitedByTh?: boolean;
+}
+
+export interface SchoolAcademicSystem extends Entity {
+  schoolId: number;
+  academicSystemId: number;
+  notes?: string; // example many-to-many with data on the association
 }

@@ -8,7 +8,7 @@ const queries: Query[] = [
   {
     slug: 'schools-includeAcademicSystems',
     path: '/schools/2848?include=academicSystems',
-    status: 'TODO',
+    status: 'WIP',
     description: 'WIP',
   },
   {

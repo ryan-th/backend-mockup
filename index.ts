@@ -5,13 +5,13 @@ import {
   getQueryStatusColor,
   queries,
 } from './modules/stackblitz-core/queries/index';
-import { runTests } from './shared/services/tests';
 import {
   // getModuleDataForQueryPath,
   getResponseFromRequest$,
 } from './shared/services/mainService';
 import { structureService } from './shared/services/structureService';
 import { mainModuleService } from './modules/main';
+import { testService } from './shared/services/tests/testService';
 
 let input: HTMLInputElement;
 let pre: HTMLPreElement;
@@ -20,7 +20,7 @@ let response$: Observable<any>;
 
 (function main() {
   // TEMP
-  // runTests(); 
+  // runTests();
 
   console.log(100);
   const foo = structureService;
@@ -42,6 +42,9 @@ function setHtml() {
     document.getElementById('requestButton')
   );
   const clearButton = <HTMLButtonElement>document.getElementById('clearButton');
+  const runTestsButton = <HTMLButtonElement>(
+    document.getElementById('runTestsButton')
+  );
   pre = <HTMLPreElement>document.getElementById('response');
 
   queries.forEach((query, i) => {
@@ -89,6 +92,41 @@ function setHtml() {
   fromEvent(clearButton, 'click')
     .pipe(map(clearResponseAndConsole))
     .subscribe();
+
+  fromEvent(runTestsButton, 'click').pipe(map(runTests)).subscribe();
+}
+
+function runTests() {
+  testService.getTestResults().subscribe((allResults) => {
+    const allErrors = allResults.filter((x) => !x.isSuccess);
+
+    if (allErrors.length === 0) {
+      pre.innerText = 'No test errors';
+      return;
+    }
+
+    const allErrors_critical = allErrors.filter((x) => !x.status);
+    const allErrors_toDo = allErrors.filter((x) => x.status === 'TODO');
+    const allErrors_wip = allErrors.filter((x) => x.status === 'WIP');
+    const testStatus =
+      allErrors_critical.length > 0
+        ? 'R'
+        : allErrors_wip.length > 0
+        ? 'A'
+        : 'G';
+    const output = {
+      status: testStatus,
+      errorCounts: {
+        All: allErrors.length,
+        'Critical (R)': allErrors_critical.length,
+        'WIP (A)': allErrors_wip.length,
+        'TODO (G)': allErrors_toDo.length,
+      },
+    };
+
+    pre.innerText = JSON.stringify(output, null, 2);
+    console.log('Test errors:', allErrors);
+  });
 }
 
 function setObservables() {

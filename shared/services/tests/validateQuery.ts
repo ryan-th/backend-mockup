@@ -28,6 +28,7 @@ export function getTestResults(): BaseTest[] {
       expect: null,
     },
     {
+      status: 'TODO',
       inputs: [prepare(entitySets, '/cities?sort=foo')],
       // TODO RR/JP: define required error response
       expect: {

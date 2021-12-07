@@ -7,7 +7,7 @@ export const mainModuleService = {
 };
 
 function createStructure() {
-  if (structureService.entitySets.length > 0) return;
+  // if (structureService.entitySets.length > 0) return;
   structureService.entitySets = [];
   structureService.entitySetRelationships = [];
 
